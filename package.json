@@ -1,0 +1,46 @@
+{
+  "name": "nosaray",
+  "version": "0.1.0",
+  "description": "Weyback Machine for Nostr",
+  "private": true,
+  "type": "module",
+  "author": "jiftechnify",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "tsc": "tsc --noEmit",
+    "lint": "run-p tsc lint:*",
+    "lint:format": "prettier --check --loglevel warn src/**/*.{js,jsx,ts,tsx,css}",
+    "lint:js": "eslint --max-warnings 0 src/",
+    "fix": "run-s fix:*",
+    "fix:format": "prettier --write --loglevel warn src/**/*.{js,jsx,ts,tsx,css}",
+    "fix:js": "eslint --fix src/",
+    "exec-ts": "node --loader esbuild-register/loader -r esbuild-register"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@tsconfig/strictest": "^1.0.1",
+    "@types/react": "^18.0.28",
+    "@types/react-dom": "^18.0.11",
+    "@typescript-eslint/eslint-plugin": "^5.30.0",
+    "@typescript-eslint/parser": "^5.30.4",
+    "@vitejs/plugin-react": "^3.1.0",
+    "esbuild": "^0.17.5",
+    "esbuild-register": "^3.3.3",
+    "eslint": "^8.18.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-jsx-a11y": "^6.7.1",
+    "eslint-plugin-react": "^7.32.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "npm-run-all": "^4.1.5",
+    "prettier": "2.7.1",
+    "typescript": "^4.9.4",
+    "vite": "^4.1.4"
+  }
+}
