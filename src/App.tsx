@@ -1,35 +1,62 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
-import "./App.css";
+import { Box, Text, VStack } from "@chakra-ui/react";
+import { useAtom, useAtomValue } from "jotai";
+import type { NostrEvent } from "nostr-fetch";
+import { utils } from "nostr-tools";
+import { Suspense, useMemo, useState } from "react";
+import { Header } from "./components/Header";
+import { LoginPane } from "./components/LoginPane";
+import { WaybackQueryForm } from "./components/WaybackQueryForm";
+import { EventFetcher } from "./nostr/EventFetcher";
+import { myDataAtom, myPubkeyAtom } from "./states/Profiles";
+import type { WaybackQuery } from "./types/WaybackQuery";
 
-function App() {
-  const [count, setCount] = useState(0);
+export const App = () => {
+  const [myPubkey, setMyPubkey] = useAtom(myPubkeyAtom);
+
+  const { followList, relayList } = useAtomValue(myDataAtom);
+  const readRelays = useMemo(
+    () =>
+      Object.entries(relayList)
+        .filter(([, usage]) => usage.read)
+        .map(([url]) => url),
+    [relayList]
+  );
+
+  const [posts, setPosts] = useState<NostrEvent[]>([]);
+
+  const handleLogin = (pkey: string) => {
+    setMyPubkey(pkey);
+  };
+
+  const handleQuery = async (q: WaybackQuery) => {
+    for await (const ev of EventFetcher.fetchTextNotes(
+      followList,
+      q,
+      readRelays
+    )) {
+      console.log(ev);
+      setPosts((prev) => utils.insertEventIntoDescendingList(prev, ev));
+    }
+  };
 
   return (
-    <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank" rel="noreferrer">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank" rel="noreferrer">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </div>
+    <Box maxW={800} mt={4} mx="auto">
+      <Header />
+      <Suspense fallback="...">
+        <Box mt={4}>
+          {myPubkey === "" && <LoginPane onLogin={handleLogin} />}
+          {myPubkey !== "" && (
+            <>
+              <WaybackQueryForm onClickQuery={handleQuery} />
+              <VStack>
+                {posts.map((post) => (
+                  <Text key={post.id}>{post.content}</Text>
+                ))}
+              </VStack>
+            </>
+          )}
+        </Box>
+      </Suspense>
+    </Box>
   );
-}
-
-export default App;
+};

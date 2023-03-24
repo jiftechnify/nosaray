@@ -4,6 +4,7 @@
     "target": "ESNext",
     "useDefineForClassFields": true,
     "noPropertyAccessFromIndexSignature": false,
+    "exactOptionalPropertyTypes": false,
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "skipLibCheck": true,
     "esModuleInterop": false,

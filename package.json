@@ -20,6 +20,17 @@
     "exec-ts": "node --loader esbuild-register/loader -r esbuild-register"
   },
   "dependencies": {
+    "@chakra-ui/react": "^2.5.2",
+    "@emotion/react": "^11.10.6",
+    "@emotion/styled": "^11.10.6",
+    "chakra-dayzed-datepicker": "^0.2.7",
+    "date-fns": "^2.29.3",
+    "dayzed": "^3.2.3",
+    "framer-motion": "^10.6.1",
+    "jotai": "^2.0.3",
+    "jotai-devtools": "^0.3.1",
+    "nostr-fetch": "^0.4.1",
+    "nostr-tools": "^1.7.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
@@ -41,6 +52,7 @@
     "npm-run-all": "^4.1.5",
     "prettier": "2.7.1",
     "typescript": "^4.9.4",
-    "vite": "^4.1.4"
+    "vite": "^4.1.4",
+    "vite-plugin-babel": "^1.1.3"
   }
 }
