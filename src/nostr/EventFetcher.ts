@@ -93,7 +93,9 @@ export class EventFetcher {
       [{ authors: pubkeys, kinds: [eventKind.text] }],
       timeRangeFilter
     );
-    return evIter;
+    for await (const ev of evIter) {
+      yield ev;
+    }
   }
 }
 

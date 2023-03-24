@@ -1,4 +1,5 @@
-import { Button, Text, VStack } from "@chakra-ui/react";
+import { RepeatClockIcon } from "@chakra-ui/icons";
+import { Button, HStack, Text, VStack } from "@chakra-ui/react";
 import { RangeDatepicker } from "chakra-dayzed-datepicker";
 import { endOfDay, getUnixTime, startOfDay } from "date-fns";
 import { useState } from "react";
@@ -33,7 +34,12 @@ export const WaybackQueryForm: React.FC<WaybackQueryFormProps> = ({
           maxDate={now}
           configs={{ dateFormat: "yyyy/MM/dd" }}
         />
-        <Button onClick={handleClickWayback}>遡る</Button>
+        <Button colorScheme="purple" onClick={handleClickWayback}>
+          <HStack>
+            <RepeatClockIcon />
+            <Text>遡る</Text>
+          </HStack>
+        </Button>
       </VStack>
     </div>
   );
