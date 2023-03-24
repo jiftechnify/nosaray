@@ -35,21 +35,24 @@ export const myPubkeyAtom = atomWithStorage<string>("my_pubkey", "");
 type UserData = {
   pubkey: string;
   profile?: NostrProfile;
-  followList: string[];
-  relayList: RelayList;
+  followList?: string[];
+  relayList?: RelayList;
 };
+
+const myDataInitializedAtom = atom(false);
 
 export const myDataAtom = atom(async (get): Promise<UserData> => {
   const pubkey = get(myPubkeyAtom);
   if (pubkey === "") {
     return {
       pubkey: "",
-      followList: [],
-      relayList: {},
+      profile: undefined,
+      followList: undefined,
+      relayList: undefined,
     };
   }
 
-  const [profile, followsAndRelays] = await Promise.all([
+  const [profile, { followList, relayList }] = await Promise.all([
     EventFetcher.fetchSingleProfile(pubkey, []),
     EventFetcher.fetchFollowAndRelayList(pubkey, []),
   ]);
@@ -57,11 +60,32 @@ export const myDataAtom = atom(async (get): Promise<UserData> => {
   if (profile) {
     store.set(profileAtomFamily(pubkey), profile);
   }
+  store.set(myDataInitializedAtom, true);
 
   return {
     pubkey,
     profile,
-    followList: followsAndRelays ? followsAndRelays.followList : [],
-    relayList: followsAndRelays ? followsAndRelays.relayList : {},
+    followList,
+    relayList,
   };
+});
+
+store.sub(myDataInitializedAtom, async () => {
+  if (store.get(myDataInitializedAtom)) {
+    const { followList, relayList } = await store.get(myDataAtom);
+    if (followList === undefined || relayList === undefined) {
+      return;
+    }
+    const readRelays = Object.entries(relayList)
+      .filter(([, usage]) => usage.read)
+      .map(([url]) => url);
+
+    for await (const [pubkey, profile] of EventFetcher.fetchProfiles(
+      followList,
+      readRelays
+    )) {
+      const profileAtom = profileAtomFamily(pubkey);
+      store.set(profileAtom, profile);
+    }
+  }
 });

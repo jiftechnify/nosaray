@@ -41,7 +41,7 @@ export class EventFetcher {
   public static async *fetchProfiles(
     pubkeys: string[],
     relayUrls: string[]
-  ): AsyncIterable<NostrProfile> {
+  ): AsyncIterable<[string, NostrProfile]> {
     const evIter = await fetcher.allEventsIterator(
       this.withBootstraps(relayUrls),
       [{ authors: pubkeys, kinds: [eventKind.metadata] }],
@@ -50,7 +50,7 @@ export class EventFetcher {
 
     for await (const ev of evIter) {
       try {
-        yield JSON.parse(ev.content) as NostrProfile; // TODO: schema validation
+        yield [ev.pubkey, JSON.parse(ev.content) as NostrProfile]; // TODO: schema validation
       } catch (err) {
         console.error(err);
       }

@@ -16,20 +16,21 @@ import { Header } from "./components/Header";
 import { LoginPane } from "./components/LoginPane";
 import { WaybackQueryForm } from "./components/WaybackQueryForm";
 import { EventFetcher } from "./nostr/EventFetcher";
-import { myDataAtom, myPubkeyAtom } from "./states/Profiles";
+import { myDataAtom, myPubkeyAtom, profileAtomFamily } from "./states/Profiles";
 import type { WaybackQuery } from "./types/WaybackQuery";
 
 export const App = () => {
   const [myPubkey, setMyPubkey] = useAtom(myPubkeyAtom);
 
-  const { followList, relayList } = useAtomValue(myDataAtom);
-  const readRelays = useMemo(
-    () =>
-      Object.entries(relayList)
-        .filter(([, usage]) => usage.read)
-        .map(([url]) => url),
-    [relayList]
-  );
+  const myData = useAtomValue(myDataAtom);
+  const readRelays = useMemo(() => {
+    if (myData?.relayList === undefined) {
+      return undefined;
+    }
+    return Object.entries(myData.relayList)
+      .filter(([, usage]) => usage.read)
+      .map(([url]) => url);
+  }, [myData.relayList]);
 
   const [posts, setPosts] = useState<NostrEvent[]>([]);
 
@@ -40,15 +41,18 @@ export const App = () => {
   const resetPosts = async () => {
     setPosts([]);
     await new Promise<void>((resolve) => {
-      setTimeout(() => resolve(), 100);
+      setTimeout(() => resolve(), 500);
     });
   };
 
   const handleQuery = async (q: WaybackQuery) => {
-    await resetPosts();
+    if (myData.followList === undefined || readRelays === undefined) {
+      return;
+    }
 
-    for await (const ev of await EventFetcher.fetchTextNotes(
-      followList,
+    await resetPosts();
+    for await (const ev of EventFetcher.fetchTextNotes(
+      myData.followList,
       q,
       readRelays
     )) {
@@ -84,18 +88,26 @@ type PostCardProps = {
 };
 
 const PostCard: React.FC<PostCardProps> = ({ post }) => {
+  const profile = useAtomValue(profileAtomFamily(post.pubkey));
+
   return (
     <Card p={2} w="100%" whiteSpace="pre-wrap" key={post.id}>
       <Grid
-        templateAreas={`"icon text"
+        templateAreas={`"icon author"
+                        "icon text"
                         "date date"`}
-        templateRows={"1fr 1.2em"}
-        templateColumns={"40px minmax(0, 1fr)"}
+        templateRows={"1.4em 1fr 1.2em"}
+        templateColumns={"48px minmax(0, 1fr)"}
         columnGap={4}
         rowGap={2}
       >
         <GridItem area="icon">
-          <Avatar size="40px" src="" />
+          <Avatar size="48px" src={profile?.picture ?? ""} />
+        </GridItem>
+        <GridItem area="author">
+          <Text fontSize="1.05em" fontWeight="bold">
+            {profile?.display_name ?? profile?.name ?? post.pubkey}
+          </Text>
         </GridItem>
         <GridItem area="text">
           <Text whiteSpace="pre-wrap">{post.content}</Text>
