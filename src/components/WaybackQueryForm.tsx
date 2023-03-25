@@ -3,8 +3,11 @@ import {
   Button,
   Flex, HStack,
   Input,
+  NumberDecrementStepper,
+  NumberIncrementStepper,
   NumberInput,
   NumberInputField,
+  NumberInputStepper,
   Select,
   Text,
   VStack
@@ -56,11 +59,11 @@ export const WaybackQueryForm: React.FC<WaybackQueryFormProps> = ({
   const now = getNow();
   const [sinceDate, setSinceDate] = useState<Date>(now);
   const [sinceTime, setSinceTime] = useState<string>(format(subHours(now, 1), "HH:mm"));
-  const [timeRangeValue, setTimeRangeValue] = useState<number | undefined>(1);
+  const [timeRangeValue, setTimeRangeValue] = useState<number>(1);
   const [timeRangeUnit, setTimeRangeUnit] = useState<TimeRangeUnit>('hours');
 
   const timeRange = useMemo(() => {
-    if (timeRangeValue === undefined) {
+    if (timeRangeValue === 0) {
       return undefined  
     }
     const since = sinceUnixtime(sinceDate, sinceTime)
@@ -100,15 +103,18 @@ export const WaybackQueryForm: React.FC<WaybackQueryFormProps> = ({
           />
           <Text minW="2em">から</Text>
           <NumberInput
-            min={1}
+            min={0}
             max={100}
-            keepWithinRange={false}
-            clampValueOnBlur={false}
+            allowMouseWheel
             value={timeRangeValue}
-            onChange={(_, n) => setTimeRangeValue(isNaN(n) ? undefined : n)}
+            onChange={(_, n) => setTimeRangeValue(isNaN(n) ? 0 : n)}
             minW="5em"
           >
             <NumberInputField  />
+            <NumberInputStepper>
+            <NumberIncrementStepper />
+            <NumberDecrementStepper />
+            </NumberInputStepper>
           </NumberInput>
           <Select value={timeRangeUnit} onChange={(e) => setTimeRangeUnit(e.target.value as TimeRangeUnit)}>
             {Object.entries(timeRangeUnitLabels).map(([unit, label]) => <option key={unit} value={unit}>{label}</option>)}
