@@ -11,7 +11,7 @@ import { format, fromUnixTime } from "date-fns";
 import { useAtom, useAtomValue } from "jotai";
 import type { NostrEvent } from "nostr-fetch";
 import { utils } from "nostr-tools";
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { Header } from "./components/Header";
 import { LoginPane } from "./components/LoginPane";
 import { WaybackQueryForm } from "./components/WaybackQueryForm";
@@ -90,20 +90,13 @@ type PostCardProps = {
 const PostCard: React.FC<PostCardProps> = ({ post }) => {
   const profile = useAtomValue(profileAtomFamily(post.pubkey));
 
-  useEffect(() => {
-    if (profile !== undefined && profile.display_name === undefined) {
-      console.log("display_name is undefied!", JSON.stringify(profile));
-    }
-  }, [profile]);
-
   return (
-    <Card p={2} w="100%" whiteSpace="pre-wrap" key={post.id}>
+    <Card p={3} w="100%" whiteSpace="pre-wrap" key={post.id}>
       <Grid
-        templateAreas={`"icon author"
-                        "icon text"
-                        "date date"`}
-        templateRows={"1.4em 1fr 1.2em"}
-        templateColumns={"48px minmax(0, 1fr)"}
+        templateAreas={`"icon author date"
+                        "icon text   text"`}
+        templateRows={"1.4em 1fr"}
+        templateColumns={"48px minmax(0, 1fr) 120px"}
         columnGap={4}
         rowGap={2}
       >
@@ -119,7 +112,9 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
           <Text whiteSpace="pre-wrap">{post.content}</Text>
         </GridItem>
         <GridItem area="date" justifySelf="end">
-          <Text>{format(fromUnixTime(post.created_at), "M/d HH:mm:ss")}</Text>
+          <Text color="gray.600">
+            {format(fromUnixTime(post.created_at), "M/d HH:mm:ss")}
+          </Text>
         </GridItem>
       </Grid>
     </Card>
