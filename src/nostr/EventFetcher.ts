@@ -4,7 +4,7 @@ import {
   NostrEvent,
   NostrFetcher,
 } from "nostr-fetch";
-import type { NostrProfile } from "../types/NostrProfile";
+import type { NostrProfile, NostrProfileWithMeta } from "../types/NostrProfile";
 import type { RelayList } from "../types/RelayList";
 
 const fetcher = new NostrFetcher({ enableDebugLog: true });
@@ -22,7 +22,7 @@ export class EventFetcher {
   public static async fetchSingleProfile(
     pubkey: string,
     relayUrls: string[]
-  ): Promise<NostrProfile | undefined> {
+  ): Promise<NostrProfileWithMeta | undefined> {
     const ev = await fetcher.fetchLastEvent(this.withBootstraps(relayUrls), [
       { authors: [pubkey], kinds: [eventKind.metadata] },
     ]);
@@ -31,7 +31,8 @@ export class EventFetcher {
     }
 
     try {
-      return JSON.parse(ev.content) as NostrProfile; // TODO: schema validation
+      const profile = JSON.parse(ev.content) as NostrProfile; // TODO: schema validation
+      return { ...profile, pubkey: ev.pubkey, created_at: ev.created_at };
     } catch (err) {
       console.error(err);
       return undefined;
@@ -41,7 +42,7 @@ export class EventFetcher {
   public static async *fetchProfiles(
     pubkeys: string[],
     relayUrls: string[]
-  ): AsyncIterable<[string, NostrProfile]> {
+  ): AsyncIterable<NostrProfileWithMeta> {
     const evIter = await fetcher.allEventsIterator(
       this.withBootstraps(relayUrls),
       [{ authors: pubkeys, kinds: [eventKind.metadata] }],
@@ -50,7 +51,8 @@ export class EventFetcher {
 
     for await (const ev of evIter) {
       try {
-        yield [ev.pubkey, JSON.parse(ev.content) as NostrProfile]; // TODO: schema validation
+        const profile = JSON.parse(ev.content) as NostrProfile; // TODO: schema validation
+        yield { ...profile, pubkey: ev.pubkey, created_at: ev.created_at };
       } catch (err) {
         console.error(err);
       }

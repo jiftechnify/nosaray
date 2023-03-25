@@ -11,7 +11,7 @@ import { format, fromUnixTime } from "date-fns";
 import { useAtom, useAtomValue } from "jotai";
 import type { NostrEvent } from "nostr-fetch";
 import { utils } from "nostr-tools";
-import { Suspense, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { Header } from "./components/Header";
 import { LoginPane } from "./components/LoginPane";
 import { WaybackQueryForm } from "./components/WaybackQueryForm";
@@ -89,6 +89,12 @@ type PostCardProps = {
 
 const PostCard: React.FC<PostCardProps> = ({ post }) => {
   const profile = useAtomValue(profileAtomFamily(post.pubkey));
+
+  useEffect(() => {
+    if (profile !== undefined && profile.display_name === undefined) {
+      console.log("display_name is undefied!", JSON.stringify(profile));
+    }
+  }, [profile]);
 
   return (
     <Card p={2} w="100%" whiteSpace="pre-wrap" key={post.id}>

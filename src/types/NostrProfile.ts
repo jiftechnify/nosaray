@@ -13,5 +13,12 @@ export type NostrProfile = {
   /** NIP-05 identifier */
   nip05?: string;
 
-  [key: string]: string | undefined;
+  [key: string]: unknown;
+};
+
+export type NostrProfileWithMeta = NostrProfile & {
+  /** `pubkey` of orifinal event */
+  pubkey: string;
+  /** `created_at` of original event */
+  created_at: number;
 };

@@ -1,30 +1,22 @@
-import { atom, getDefaultStore, useSetAtom } from "jotai";
+import { atom, getDefaultStore } from "jotai";
 import { atomFamily, atomWithStorage } from "jotai/utils";
 import { EventFetcher } from "../nostr/EventFetcher";
-import type { NostrProfile } from "../types/NostrProfile";
+import type { NostrProfile, NostrProfileWithMeta } from "../types/NostrProfile";
 import type { RelayList } from "../types/RelayList";
 
 const store = getDefaultStore();
 
-const profilesAtom = atom<Record<string, NostrProfile>>({});
-
-export const useProfileSetter = (): ((
-  pubkey: string,
-  profile: NostrProfile
-) => void) => {
-  const setProfiles = useSetAtom(profilesAtom);
-  return (pubkey: string, profile: NostrProfile) => {
-    setProfiles((prev) => {
-      return { ...prev, [pubkey]: profile };
-    });
-  };
-};
+const profilesAtom = atom<Record<string, NostrProfileWithMeta>>({});
 
 export const profileAtomFamily = atomFamily((pubkey: string) =>
   atom(
     (get) => get(profilesAtom)[pubkey],
-    (get, set, arg: NostrProfile) => {
+    (get, set, arg: NostrProfileWithMeta) => {
       const prev = get(profilesAtom);
+      const prevProfile = prev[pubkey];
+      if (prevProfile && arg.created_at < prevProfile.created_at) {
+        return;
+      }
       set(profilesAtom, { ...prev, [pubkey]: arg });
     }
   )
@@ -80,11 +72,11 @@ store.sub(myDataInitializedAtom, async () => {
       .filter(([, usage]) => usage.read)
       .map(([url]) => url);
 
-    for await (const [pubkey, profile] of EventFetcher.fetchProfiles(
+    for await (const profile of EventFetcher.fetchProfiles(
       followList,
       readRelays
     )) {
-      const profileAtom = profileAtomFamily(pubkey);
+      const profileAtom = profileAtomFamily(profile.pubkey);
       store.set(profileAtom, profile);
     }
   }
