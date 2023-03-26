@@ -1,8 +1,10 @@
 import { atom, getDefaultStore } from "jotai";
 import { atomFamily, atomWithStorage } from "jotai/utils";
 import { EventFetcher } from "../nostr/EventFetcher";
+import { getReadRelays } from "../nostr/utils";
 import type { NostrProfile, NostrProfileWithMeta } from "../types/NostrProfile";
 import type { RelayList } from "../types/RelayList";
+import { nip07ExtAtom } from "./Nip07Ext";
 import { clearPosts } from "./Posts";
 
 const store = getDefaultStore();
@@ -50,9 +52,12 @@ export const myDataAtom = atom(async (get): Promise<UserData> => {
     };
   }
 
+  const nip07Ext = await get(nip07ExtAtom);
+  const readRelaysFromExt = getReadRelays((await nip07Ext?.getRelays()) ?? {});
+
   const [profile, { followList, relayList }] = await Promise.all([
-    EventFetcher.fetchSingleProfile(pubkey, []),
-    EventFetcher.fetchFollowAndRelayList(pubkey, []),
+    EventFetcher.fetchSingleProfile(pubkey, readRelaysFromExt),
+    EventFetcher.fetchFollowAndRelayList(pubkey, readRelaysFromExt),
   ]);
 
   if (profile) {
@@ -74,13 +79,9 @@ store.sub(myDataInitializedAtom, async () => {
     if (followList === undefined || relayList === undefined) {
       return;
     }
-    const readRelays = Object.entries(relayList)
-      .filter(([, usage]) => usage.read)
-      .map(([url]) => url);
-
     for await (const profile of EventFetcher.fetchProfiles(
       followList,
-      readRelays
+      getReadRelays(relayList)
     )) {
       const profileAtom = profileAtomFamily(profile.pubkey);
       store.set(profileAtom, profile);

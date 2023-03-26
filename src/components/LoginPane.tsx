@@ -10,26 +10,26 @@ import {
 } from "@chakra-ui/react";
 import { useAtomValue } from "jotai";
 import { loadable } from "jotai/utils";
-import { isNip07ExtAvailableAtom } from "../states/Nip07Ext";
+import { nip07ExtAtom } from "../states/Nip07Ext";
 
 type LoginPaneProps = {
   onLogin: (pubkey: string) => void;
 };
 
 export const LoginPane: React.FC<LoginPaneProps> = ({ onLogin }) => {
-  const nip07ExtAvailability = useAtomValue(loadable(isNip07ExtAvailableAtom));
+  const nip07Ext = useAtomValue(loadable(nip07ExtAtom));
 
   const handleClickLogin = async () => {
     onLogin(await window.nostr.getPublicKey());
   };
 
   const content = (() => {
-    switch (nip07ExtAvailability.state) {
+    switch (nip07Ext.state) {
       case "loading":
         return <Spinner />;
 
       case "hasData":
-        const available = nip07ExtAvailability.data;
+        const available = nip07Ext.data !== undefined;
         return available ? (
           <HStack>
             <Text>NIP-07拡張機能で</Text>

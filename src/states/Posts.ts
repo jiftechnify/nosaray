@@ -3,6 +3,7 @@ import { atomFamily } from "jotai/utils";
 import type { NostrEvent } from "nostr-fetch";
 import { useEffect } from "react";
 import { EventFetcher } from "../nostr/EventFetcher";
+import { getReadRelays } from "../nostr/utils";
 import type { WaybackQuery } from "../types/WaybackQuery";
 import { myDataAtom } from "./Profiles";
 
@@ -79,14 +80,9 @@ export const clearPosts = () => {
 
 export const startFetchingPosts = async (waybackQuery: WaybackQuery) => {
   const myData = await store.get(myDataAtom);
-  const readRelays = (() => {
-    if (myData?.relayList === undefined) {
-      return undefined;
-    }
-    return Object.entries(myData.relayList)
-      .filter(([, usage]) => usage.read)
-      .map(([url]) => url);
-  })();
+  const readRelays = myData?.relayList
+    ? getReadRelays(myData.relayList)
+    : undefined;
 
   if (
     myData.pubkey === "" ||
