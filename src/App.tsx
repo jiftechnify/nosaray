@@ -1,6 +1,6 @@
-import { Box, Spinner } from "@chakra-ui/react";
+import { Box, Spinner, VStack } from "@chakra-ui/react";
 import { useAtom } from "jotai";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import { Header } from "./components/Header";
 import { LoginPane } from "./components/LoginPane";
 import { PostTimeline } from "./components/PostTimeline";
@@ -11,12 +11,16 @@ import type { WaybackQuery } from "./types/WaybackQuery";
 
 export const App = () => {
   const [myPubkey, setMyPubkey] = useAtom(myPubkeyAtom);
+  const [ongoingWaybackQuery, setOngoingWaybackQuery] = useState<
+    WaybackQuery | undefined
+  >(undefined);
 
   const handleLogin = (pkey: string) => {
     setMyPubkey(pkey);
   };
 
   const handleWayback = async (q: WaybackQuery) => {
+    setOngoingWaybackQuery(q);
     await startFetchingPosts(q);
   };
 
@@ -24,13 +28,16 @@ export const App = () => {
     <Box maxW={800} mt={4} mx="auto">
       <Header />
       <Suspense fallback={<Spinner />}>
-        <Box mt={4}>
+        <Box my={4}>
           {myPubkey === "" && <LoginPane onLogin={handleLogin} />}
           {myPubkey !== "" && (
-            <>
+            <VStack gap={4}>
               <WaybackQueryForm onClickWayback={handleWayback} />
-              <PostTimeline postQuery={{ order: "created-at-desc" }} />
-            </>
+              <PostTimeline
+                ongoingWaybackQuery={ongoingWaybackQuery}
+                postQuery={{ order: "created-at-desc" }}
+              />
+            </VStack>
           )}
         </Box>
       </Suspense>
