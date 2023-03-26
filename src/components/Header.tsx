@@ -1,5 +1,6 @@
 import {
   Avatar,
+  Box,
   Flex,
   Heading,
   Menu,
@@ -12,7 +13,6 @@ import {
 } from "@chakra-ui/react";
 import { useAtomValue } from "jotai";
 import { useResetAtom } from "jotai/utils";
-import { Suspense } from "react";
 import { myDataAtom, myPubkeyAtom } from "../states/Profiles";
 
 export const Header: React.FC = () => {
@@ -27,9 +27,9 @@ export const Header: React.FC = () => {
       </Text>
       <Spacer />
       {isLoggedIn && (
-        <Suspense>
+        <Box cursor="pointer" alignSelf="center">
           <AccountMenu />
-        </Suspense>
+        </Box>
       )}
     </Flex>
   );
@@ -43,12 +43,7 @@ const AccountMenu: React.FC = () => {
 
   return (
     <Menu>
-      <MenuButton
-        as={Avatar}
-        size="sm"
-        src={profile?.picture ?? ""}
-        alignSelf="center"
-      />
+      <MenuButton as={Avatar} size="sm" src={profile?.picture ?? ""} />
       <MenuList>
         <MenuGroup title={tipText}>
           <MenuItem onClick={resetMyPubkey}>ログアウト</MenuItem>
