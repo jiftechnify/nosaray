@@ -1,6 +1,15 @@
-import { Avatar, Card, Grid, GridItem, Text } from "@chakra-ui/react";
+import {
+  Avatar,
+  Card,
+  Fade,
+  Grid,
+  GridItem,
+  Text,
+  useClipboard,
+} from "@chakra-ui/react";
 import { format, fromUnixTime } from "date-fns";
 import { atom, useAtomValue } from "jotai";
+import { nip19 } from "nostr-tools";
 import { usePost } from "../states/Posts";
 import { profileAtomFamily } from "../states/Profiles";
 
@@ -15,12 +24,23 @@ export const Post: React.FC<PostProps> = ({ id }) => {
   const profile = useAtomValue(
     post ? profileAtomFamily(post.pubkey) : undefAtom
   );
+  const { onCopy, hasCopied } = useClipboard(
+    post?.id ? nip19.noteEncode(post.id) : ""
+  );
 
   if (post === undefined) {
     return null;
   }
   return (
-    <Card p={3} w="100%" whiteSpace="pre-wrap" key={post.id}>
+    <Card
+      p={3}
+      w="100%"
+      whiteSpace="pre-wrap"
+      key={post.id}
+      onClick={onCopy}
+      cursor="pointer"
+      _hover={{ backgroundColor: "gray.50" }}
+    >
       <Grid
         templateAreas={`"icon author date"
                         "icon text   text"`}
@@ -46,6 +66,11 @@ export const Post: React.FC<PostProps> = ({ id }) => {
           </Text>
         </GridItem>
       </Grid>
+      <Fade in={hasCopied}>
+        <Text fontSize="xs" position="absolute" right="8px" bottom="8px">
+          Copied Note ID!
+        </Text>
+      </Fade>
     </Card>
   );
 };
