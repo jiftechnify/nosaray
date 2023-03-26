@@ -45,14 +45,14 @@ export const App = () => {
     });
   };
 
-  const handleQuery = async (q: WaybackQuery) => {
+  const handleWayback = async (q: WaybackQuery) => {
     if (myData.followList === undefined || readRelays === undefined) {
       return;
     }
 
     await resetPosts();
     for await (const ev of EventFetcher.fetchTextNotes(
-      myData.followList,
+      dedup([...myData.followList, myPubkey]),
       q,
       readRelays
     )) {
@@ -69,7 +69,7 @@ export const App = () => {
           {myPubkey === "" && <LoginPane onLogin={handleLogin} />}
           {myPubkey !== "" && (
             <>
-              <WaybackQueryForm onClickQuery={handleQuery} />
+              <WaybackQueryForm onClickWayback={handleWayback} />
               <VStack mt={4}>
                 {posts.map((post) => (
                   <PostCard key={post.id} post={post} />
@@ -82,6 +82,10 @@ export const App = () => {
     </Box>
   );
 };
+
+function dedup<T>(arr: T[]) {
+  return Array.from(new Set(arr));
+}
 
 type PostCardProps = {
   post: NostrEvent;

@@ -50,11 +50,11 @@ const secsPerTimeUnit = (unit: TimeRangeUnit): number => {
 const formatUnixtime = (unixtime: number) => format(fromUnixTime(unixtime), "yyyy/MM/dd HH:mm")
 
 type WaybackQueryFormProps = {
-  onClickQuery: (q: WaybackQuery) => void;
+  onClickWayback: (q: WaybackQuery) => void;
 };
 
 export const WaybackQueryForm: React.FC<WaybackQueryFormProps> = ({
-  onClickQuery,
+  onClickWayback,
 }) => {
   const now = getNow();
   const [sinceDate, setSinceDate] = useState<Date>(now);
@@ -79,7 +79,7 @@ export const WaybackQueryForm: React.FC<WaybackQueryFormProps> = ({
     if (timeRange === undefined) {
       return
     }
-    onClickQuery({...timeRange});
+    onClickWayback({...timeRange});
   };
 
   return (
