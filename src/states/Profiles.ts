@@ -3,6 +3,7 @@ import { atomFamily, atomWithStorage } from "jotai/utils";
 import { EventFetcher } from "../nostr/EventFetcher";
 import type { NostrProfile, NostrProfileWithMeta } from "../types/NostrProfile";
 import type { RelayList } from "../types/RelayList";
+import { clearPosts } from "./Posts";
 
 const store = getDefaultStore();
 
@@ -36,6 +37,11 @@ const myDataInitializedAtom = atom(false);
 export const myDataAtom = atom(async (get): Promise<UserData> => {
   const pubkey = get(myPubkeyAtom);
   if (pubkey === "") {
+    // reset data caches
+    store.set(profilesAtom, {});
+    store.set(myDataInitializedAtom, false);
+    clearPosts();
+
     return {
       pubkey: "",
       profile: undefined,

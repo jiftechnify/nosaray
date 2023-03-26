@@ -1,13 +1,22 @@
-import { Avatar, Flex, Heading, Spacer, Text, Tooltip } from "@chakra-ui/react";
+import {
+  Avatar,
+  Flex,
+  Heading,
+  Menu,
+  MenuButton,
+  MenuGroup,
+  MenuItem,
+  MenuList,
+  Spacer,
+  Text,
+} from "@chakra-ui/react";
 import { useAtomValue } from "jotai";
-import { myDataAtom } from "../states/Profiles";
+import { useResetAtom } from "jotai/utils";
+import { Suspense } from "react";
+import { myDataAtom, myPubkeyAtom } from "../states/Profiles";
 
 export const Header: React.FC = () => {
-  const { profile } = useAtomValue(myDataAtom);
-
-  const tipText = `${
-    profile?.display_name ? profile.display_name + " として" : ""
-  }ログイン中`;
+  const isLoggedIn = useAtomValue(myPubkeyAtom) !== "";
 
   return (
     <Flex w={800} align="baseline">
@@ -17,9 +26,34 @@ export const Header: React.FC = () => {
         Wayback Machine for Nostr.
       </Text>
       <Spacer />
-      <Tooltip label={tipText}>
-        <Avatar size="sm" src={profile?.picture ?? ""} alignSelf="center" />
-      </Tooltip>
+      {isLoggedIn && (
+        <Suspense>
+          <AccountMenu />
+        </Suspense>
+      )}
     </Flex>
+  );
+};
+
+const AccountMenu: React.FC = () => {
+  const { profile } = useAtomValue(myDataAtom);
+  const tipText = profile?.display_name ?? profile?.name ?? "ログイン中";
+
+  const resetMyPubkey = useResetAtom(myPubkeyAtom);
+
+  return (
+    <Menu>
+      <MenuButton
+        as={Avatar}
+        size="sm"
+        src={profile?.picture ?? ""}
+        alignSelf="center"
+      />
+      <MenuList>
+        <MenuGroup title={tipText}>
+          <MenuItem onClick={resetMyPubkey}>ログアウト</MenuItem>
+        </MenuGroup>
+      </MenuList>
+    </Menu>
   );
 };
