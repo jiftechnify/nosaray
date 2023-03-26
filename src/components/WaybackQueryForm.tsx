@@ -57,7 +57,7 @@ export const WaybackQueryForm: React.FC<WaybackQueryFormProps> = ({
   onClickWayback,
 }) => {
   const now = getNow();
-  const [sinceDate, setSinceDate] = useState<Date>(now);
+  const [sinceDate, setSinceDate] = useState<Date>(subHours(now, 1));
   const [sinceTime, setSinceTime] = useState<string>(format(subHours(now, 1), "HH:mm"));
   const [timeRangeValue, setTimeRangeValue] = useState<number>(1);
   const [timeRangeUnit, setTimeRangeUnit] = useState<TimeRangeUnit>('hours');
