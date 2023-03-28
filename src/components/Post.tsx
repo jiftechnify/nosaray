@@ -50,7 +50,7 @@ export const Post: React.FC<PostProps> = ({ id }) => {
                         "icon text   text"`}
         templateRows={"1.4em 1fr"}
         templateColumns={"48px minmax(0, 1fr) 120px"}
-        columnGap={4}
+        columnGap={2}
         rowGap={2}
       >
         <GridItem area="icon">
