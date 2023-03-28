@@ -15,7 +15,7 @@ export const PostTimeline: React.FC<PostTimelineProps> = ({
   const postIds = usePostIds(postQuery);
 
   return (
-    <VStack>
+    <VStack w="100%">
       {ongoingWaybackQuery && (
         <HStack alignItems="baseline" alignSelf="start">
           <Text fontSize="2xl" fontWeight="bold">
