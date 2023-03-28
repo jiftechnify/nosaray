@@ -16,11 +16,16 @@ import { nip19 } from "nostr-tools";
 import { usePost } from "../states/Posts";
 import { profileAtomFamily } from "../states/Profiles";
 
-type PostProps = {
-  id: string;
+const toTruncatedNpub = (hexPubkey: string) => {
+  const npub = nip19.npubEncode(hexPubkey);
+  return `${npub.slice(0, 8)}:${npub.slice(-8)}`;
 };
 
 const undefAtom = atom(undefined);
+
+type PostProps = {
+  id: string;
+};
 
 export const Post: React.FC<PostProps> = ({ id }) => {
   const post = usePost(id);
@@ -53,7 +58,9 @@ export const Post: React.FC<PostProps> = ({ id }) => {
         </GridItem>
         <GridItem area="author">
           <Text fontSize="1.05em" fontWeight="bold">
-            {profile?.display_name ?? profile?.name ?? post.pubkey}
+            {profile?.display_name ??
+              profile?.name ??
+              toTruncatedNpub(post.pubkey)}
           </Text>
         </GridItem>
         <GridItem area="text">
