@@ -112,7 +112,7 @@ const OpenViaNosTxButton: React.FC<OpenViaNosTxButtonProps> = ({ noteId }) => {
   };
 
   return (
-    <Tooltip label="NosTxで開く">
+    <Tooltip label="NosTx経由で開く">
       <Box
         role="button"
         aria-label="open the note via NosTx"
