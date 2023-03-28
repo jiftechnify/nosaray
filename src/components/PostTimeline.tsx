@@ -1,4 +1,4 @@
-import { HStack, Text, VStack } from "@chakra-ui/react";
+import { Flex, HStack, Text } from "@chakra-ui/react";
 import { PostQuery, usePostIds } from "../states/Posts";
 import { formatWaybackQuery, WaybackQuery } from "../types/WaybackQuery";
 import { Post } from "./Post";
@@ -15,7 +15,7 @@ export const PostTimeline: React.FC<PostTimelineProps> = ({
   const postIds = usePostIds(postQuery);
 
   return (
-    <VStack w="100%">
+    <Flex w="100%" direction="column" gap={1}>
       {ongoingWaybackQuery && (
         <HStack alignItems="baseline" alignSelf="start">
           <Text fontSize="2xl" fontWeight="bold">
@@ -27,6 +27,6 @@ export const PostTimeline: React.FC<PostTimelineProps> = ({
       {postIds.map((id) => (
         <Post key={id} id={id} />
       ))}
-    </VStack>
+    </Flex>
   );
 };

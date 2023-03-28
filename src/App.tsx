@@ -1,4 +1,4 @@
-import { Box, Spinner, VStack } from "@chakra-ui/react";
+import { Box, Flex, Spinner } from "@chakra-ui/react";
 import { useAtom } from "jotai";
 import { Suspense, useState } from "react";
 import { Header } from "./components/Header";
@@ -25,19 +25,19 @@ export const App = () => {
   };
 
   return (
-    <Box maxW={800} mt={4} mx="auto">
+    <Box maxW={800} m={4} mx="auto">
       <Header />
       <Suspense fallback={<Spinner />}>
-        <Box my={4}>
+        <Box mt={4}>
           {myPubkey === "" && <LoginPane onLogin={handleLogin} />}
           {myPubkey !== "" && (
-            <VStack gap={4}>
+            <Flex direction="column" gap={4}>
               <WaybackQueryForm onClickWayback={handleWayback} />
               <PostTimeline
                 ongoingWaybackQuery={ongoingWaybackQuery}
                 postQuery={{ order: "created-at-desc" }}
               />
-            </VStack>
+            </Flex>
           )}
         </Box>
       </Suspense>
