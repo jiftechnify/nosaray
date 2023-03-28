@@ -13,6 +13,8 @@ import {
 } from "@chakra-ui/react";
 import { useAtomValue } from "jotai";
 import { useResetAtom } from "jotai/utils";
+import { Suspense } from "react";
+import { clearAllStates } from "../states";
 import { myDataAtom, myPubkeyAtom } from "../states/Profiles";
 
 export const Header: React.FC = () => {
@@ -26,11 +28,13 @@ export const Header: React.FC = () => {
         Wayback Machine for Nostr.
       </Text>
       <Spacer />
-      {isLoggedIn && (
-        <Box cursor="pointer" alignSelf="center">
-          <AccountMenu />
-        </Box>
-      )}
+      <Suspense>
+        {isLoggedIn && (
+          <Box cursor="pointer" alignSelf="center">
+            <AccountMenu />
+          </Box>
+        )}
+      </Suspense>
     </Flex>
   );
 };
@@ -40,13 +44,17 @@ const AccountMenu: React.FC = () => {
   const tipText = profile?.display_name ?? profile?.name ?? "ログイン中";
 
   const resetMyPubkey = useResetAtom(myPubkeyAtom);
+  const handleClickLogout = () => {
+    resetMyPubkey();
+    clearAllStates();
+  };
 
   return (
     <Menu>
       <MenuButton as={Avatar} size="sm" src={profile?.picture ?? ""} />
       <MenuList>
         <MenuGroup title={tipText}>
-          <MenuItem onClick={resetMyPubkey}>ログアウト</MenuItem>
+          <MenuItem onClick={handleClickLogout}>ログアウト</MenuItem>
         </MenuGroup>
       </MenuList>
     </Menu>

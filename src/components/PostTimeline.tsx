@@ -1,17 +1,16 @@
 import { Flex, HStack, Text } from "@chakra-ui/react";
+import { useAtomValue } from "jotai";
 import { PostQuery, usePostIds } from "../states/Posts";
-import { formatWaybackQuery, WaybackQuery } from "../types/WaybackQuery";
+import { ongoingWaybackQueryAtom } from "../states/WaybackQuery";
+import { formatWaybackQuery } from "../types/WaybackQuery";
 import { Post } from "./Post";
 
 type PostTimelineProps = {
-  ongoingWaybackQuery?: WaybackQuery;
   postQuery: PostQuery;
 };
 
-export const PostTimeline: React.FC<PostTimelineProps> = ({
-  ongoingWaybackQuery,
-  postQuery,
-}) => {
+export const PostTimeline: React.FC<PostTimelineProps> = ({ postQuery }) => {
+  const ongoingWaybackQuery = useAtomValue(ongoingWaybackQueryAtom);
   const postIds = usePostIds(postQuery);
 
   return (

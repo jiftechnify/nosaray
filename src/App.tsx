@@ -1,19 +1,18 @@
 import { Box, Flex, Spinner } from "@chakra-ui/react";
-import { useAtom } from "jotai";
-import { Suspense, useState } from "react";
+import { useAtom, useSetAtom } from "jotai";
+import { Suspense } from "react";
 import { Header } from "./components/Header";
 import { LoginPane } from "./components/LoginPane";
 import { PostTimeline } from "./components/PostTimeline";
 import { WaybackQueryForm } from "./components/WaybackQueryForm";
 import { startFetchingPosts } from "./states/Posts";
 import { myPubkeyAtom } from "./states/Profiles";
+import { ongoingWaybackQueryAtom } from "./states/WaybackQuery";
 import type { WaybackQuery } from "./types/WaybackQuery";
 
 export const App = () => {
   const [myPubkey, setMyPubkey] = useAtom(myPubkeyAtom);
-  const [ongoingWaybackQuery, setOngoingWaybackQuery] = useState<
-    WaybackQuery | undefined
-  >(undefined);
+  const setOngoingWaybackQuery = useSetAtom(ongoingWaybackQueryAtom);
 
   const handleLogin = (pkey: string) => {
     setMyPubkey(pkey);
@@ -33,10 +32,7 @@ export const App = () => {
           {myPubkey !== "" && (
             <Flex direction="column" gap={4}>
               <WaybackQueryForm onClickWayback={handleWayback} />
-              <PostTimeline
-                ongoingWaybackQuery={ongoingWaybackQuery}
-                postQuery={{ order: "created-at-desc" }}
-              />
+              <PostTimeline postQuery={{ order: "created-at-desc" }} />
             </Flex>
           )}
         </Box>

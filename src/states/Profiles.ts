@@ -5,11 +5,10 @@ import { getReadRelays } from "../nostr/utils";
 import type { NostrProfile, NostrProfileWithMeta } from "../types/NostrProfile";
 import type { RelayList } from "../types/RelayList";
 import { nip07ExtAtom } from "./Nip07Ext";
-import { clearPosts } from "./Posts";
 
 const store = getDefaultStore();
 
-const profilesAtom = atom<Record<string, NostrProfileWithMeta>>({});
+export const profilesAtom = atom<Record<string, NostrProfileWithMeta>>({});
 
 export const profileAtomFamily = atomFamily((pubkey: string) =>
   atom(
@@ -34,16 +33,11 @@ type UserData = {
   relayList?: RelayList;
 };
 
-const myDataInitializedAtom = atom(false);
+export const myDataInitializedAtom = atom(false);
 
 export const myDataAtom = atom(async (get): Promise<UserData> => {
   const pubkey = get(myPubkeyAtom);
   if (pubkey === "") {
-    // reset data caches
-    store.set(profilesAtom, {});
-    store.set(myDataInitializedAtom, false);
-    clearPosts();
-
     return {
       pubkey: "",
       profile: undefined,
@@ -88,3 +82,8 @@ store.sub(myDataInitializedAtom, async () => {
     }
   }
 });
+
+export const clearProfiles = () => {
+  store.set(profilesAtom, {});
+  store.set(myDataInitializedAtom, false);
+};
