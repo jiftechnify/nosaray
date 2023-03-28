@@ -1,10 +1,13 @@
+import { CheckIcon, CopyIcon, ExternalLinkIcon } from "@chakra-ui/icons";
 import {
   Avatar,
+  Box,
   Card,
-  Fade,
   Grid,
   GridItem,
+  HStack,
   Text,
+  Tooltip,
   useClipboard,
 } from "@chakra-ui/react";
 import { format, fromUnixTime } from "date-fns";
@@ -24,9 +27,7 @@ export const Post: React.FC<PostProps> = ({ id }) => {
   const profile = useAtomValue(
     post ? profileAtomFamily(post.pubkey) : undefAtom
   );
-  const { onCopy, hasCopied } = useClipboard(
-    post?.id ? nip19.noteEncode(post.id) : ""
-  );
+  const noteId = post?.id ? nip19.noteEncode(post.id) : undefined;
 
   if (post === undefined) {
     return null;
@@ -37,8 +38,6 @@ export const Post: React.FC<PostProps> = ({ id }) => {
       w="100%"
       whiteSpace="pre-wrap"
       key={post.id}
-      onClick={onCopy}
-      cursor="pointer"
       _hover={{ backgroundColor: "gray.50" }}
     >
       <Grid
@@ -66,11 +65,54 @@ export const Post: React.FC<PostProps> = ({ id }) => {
           </Text>
         </GridItem>
       </Grid>
-      <Fade in={hasCopied}>
-        <Text fontSize="xs" position="absolute" right="8px" bottom="8px">
-          Copied Note ID!
-        </Text>
-      </Fade>
+      <HStack position="absolute" top="12px" left="800px" px={2}>
+        {noteId && <CopyNoteIdButton noteId={nip19.noteEncode(post.id)} />}
+        {noteId && <OpenViaNosTxButton noteId={noteId} />}
+      </HStack>
     </Card>
+  );
+};
+
+type CopyNoteIdButtonProps = {
+  noteId: string; // note1...
+};
+
+const CopyNoteIdButton: React.FC<CopyNoteIdButtonProps> = ({ noteId }) => {
+  const { onCopy, hasCopied } = useClipboard(noteId);
+
+  return (
+    <Tooltip label={hasCopied ? "" : "Note IDをコピー"}>
+      <Box role="button" aria-label="copy note id" onClick={onCopy}>
+        {hasCopied ? (
+          <CheckIcon color="green.300" />
+        ) : (
+          <CopyIcon color="gray.500" />
+        )}
+      </Box>
+    </Tooltip>
+  );
+};
+
+const NosTx_BASE_URL = "https://nostx.shino3.net";
+
+type OpenViaNosTxButtonProps = {
+  noteId: string; // note1...
+};
+
+const OpenViaNosTxButton: React.FC<OpenViaNosTxButtonProps> = ({ noteId }) => {
+  const handleClick = () => {
+    window.open(`${NosTx_BASE_URL}/${noteId}`);
+  };
+
+  return (
+    <Tooltip label="NosTxで開く">
+      <Box
+        role="button"
+        aria-label="open the note via NosTx"
+        onClick={handleClick}
+      >
+        <ExternalLinkIcon color="gray.500" />
+      </Box>
+    </Tooltip>
   );
 };
