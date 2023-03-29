@@ -72,7 +72,7 @@ export const Post: React.FC<PostProps> = ({ id }) => {
           </Text>
         </GridItem>
       </Grid>
-      <HStack position="absolute" top="12px" left="800px" px={2}>
+      <HStack position="absolute" top="11px" left="800px" px={2}>
         {noteId && <CopyNoteIdButton noteId={nip19.noteEncode(post.id)} />}
         {noteId && <OpenViaNosTxButton noteId={noteId} />}
       </HStack>
