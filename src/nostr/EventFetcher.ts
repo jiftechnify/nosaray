@@ -4,8 +4,9 @@ import {
   NostrEvent,
   NostrFetcher,
 } from "nostr-fetch";
-import type { NostrProfile, NostrProfileWithMeta } from "../types/NostrProfile";
+import type { NostrProfileWithMeta } from "../types/NostrProfile";
 import type { RelayList } from "../types/RelayList";
+import { parseNostrProfile } from "./ProfileParser";
 
 const fetcher = new NostrFetcher({ enableDebugLog: true });
 
@@ -30,13 +31,10 @@ export class EventFetcher {
       return undefined;
     }
 
-    try {
-      const profile = JSON.parse(ev.content) as NostrProfile; // TODO: schema validation
-      return { ...profile, pubkey: ev.pubkey, created_at: ev.created_at };
-    } catch (err) {
-      console.error(err);
-      return undefined;
-    }
+    const profile = parseNostrProfile(ev.content);
+    return profile
+      ? { ...profile, pubkey: ev.pubkey, created_at: ev.created_at }
+      : undefined;
   }
 
   public static async *fetchProfiles(
@@ -50,12 +48,11 @@ export class EventFetcher {
     );
 
     for await (const ev of evIter) {
-      try {
-        const profile = JSON.parse(ev.content) as NostrProfile; // TODO: schema validation
-        yield { ...profile, pubkey: ev.pubkey, created_at: ev.created_at };
-      } catch (err) {
-        console.error(err);
+      const profile = parseNostrProfile(ev.content);
+      if (!profile) {
+        continue;
       }
+      yield { ...profile, pubkey: ev.pubkey, created_at: ev.created_at };
     }
   }
 
