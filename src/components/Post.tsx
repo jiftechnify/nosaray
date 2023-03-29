@@ -58,7 +58,7 @@ export const Post: React.FC<PostProps> = ({ id }) => {
         </GridItem>
         <GridItem area="author">
           <Text fontSize="1.05em" fontWeight="bold">
-            {profile?.display_name ??
+            {profile?.displayName ??
               profile?.name ??
               toTruncatedNpub(post.pubkey)}
           </Text>

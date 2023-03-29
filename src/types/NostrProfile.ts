@@ -5,11 +5,13 @@ export type NostrProfile = {
   /** Screen name */
   name?: string;
   /** Display name */
-  display_name?: string;
+  displayName?: string;
   /** Bio */
   about?: string;
-  /** URL of user's icon */
+  /** URL of the user's icon */
   picture?: string;
+  /** URL of the banner image */
+  banner?: string;
   /** NIP-05 identifier */
   nip05?: string;
 

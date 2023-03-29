@@ -41,7 +41,7 @@ export const Header: React.FC = () => {
 
 const AccountMenu: React.FC = () => {
   const { profile } = useAtomValue(myDataAtom);
-  const tipText = profile?.display_name ?? profile?.name ?? "ログイン中";
+  const tipText = profile?.displayName ?? profile?.name ?? "ログイン中";
 
   const resetMyPubkey = useResetAtom(myPubkeyAtom);
   const handleClickLogout = () => {
