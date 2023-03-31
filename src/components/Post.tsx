@@ -47,7 +47,6 @@ export const Post: React.FC<PostProps> = ({ id }) => {
       _hover={{ backgroundColor: isSelected ? "purple.200" : "gray.50" }}
       transition="background-color 0.1s"
       key={post.id}
-      onClick={toggleSelection}
     >
       <Grid
         templateAreas={`"icon author date"
@@ -56,6 +55,7 @@ export const Post: React.FC<PostProps> = ({ id }) => {
         templateColumns={"48px minmax(0, 1fr) 120px"}
         columnGap={2}
         rowGap={2}
+        onClick={toggleSelection} // TODO
       >
         <GridItem area="icon">
           <Avatar size="48px" src={profile?.picture ?? ""} />
