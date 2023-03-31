@@ -21,14 +21,13 @@ export const CopyNoteIdsButton: React.FC<CopyNoteIdsButtonProps> = (props) => {
   const { onCopy } = useClipboard(lineSeparatedIds);
 
   return selectedIds.length > 0 ? (
-    <Tooltip label="選択した投稿のIDをコピー">
+    <Tooltip label="選択投稿のIDを一括コピー">
       <IconButton
         aria-label="copy note ids of selected posts"
         icon={<CopyIcon />}
         onClick={() => {
           onCopy();
           clearPostSelection();
-          console.log(selectedIds);
         }}
         {...props}
       />
