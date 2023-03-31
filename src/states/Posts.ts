@@ -38,8 +38,21 @@ const postAtomFamily = atomFamily((eventId: string) =>
   )
 );
 
+export type PostOrder = "created-at-desc" | "created-at-asc";
+
+const comparePostsFn = (
+  order: PostOrder
+): ((a: NostrEvent, b: NostrEvent) => number) => {
+  switch (order) {
+    case "created-at-desc":
+      return (a, b) => b.created_at - a.created_at;
+    case "created-at-asc":
+      return (a, b) => a.created_at - b.created_at;
+  }
+};
+
 export type PostQuery = {
-  order: "created-at-desc" | "created-at-asc";
+  order: PostOrder;
 };
 
 const postQueryAtom = atom<PostQuery>({ order: "created-at-desc" });
@@ -48,12 +61,8 @@ const postIdsAtom = atom((get) => {
   const posts = Array.from(get(postsAtom).values());
   const query = get(postQueryAtom);
 
-  switch (query.order) {
-    case "created-at-desc":
-      return posts.sort((a, b) => b.created_at - a.created_at).map((p) => p.id);
-    case "created-at-asc":
-      return posts.sort((a, b) => a.created_at - b.created_at).map((p) => p.id);
-  }
+  const compareFn = comparePostsFn(query.order);
+  return posts.sort(compareFn).map((p) => p.id);
 });
 
 export const usePost = (id: string) => {
@@ -108,3 +117,24 @@ export const startFetchingPosts = async (waybackQuery: WaybackQuery) => {
 function dedup<T>(arr: T[]) {
   return Array.from(new Set(arr));
 }
+
+const selectedPostIdSetAtom = atom<Set<string>>(new Set<string>());
+
+const selectedPostsOrderAtom = atom<PostOrder>("created-at-asc");
+
+const selectedPostIdsAtom = atom<string[]>((get) => {
+  const posts = get(postsAtom);
+  const selectedIdSet = get(selectedPostIdSetAtom);
+  const order = get(selectedPostsOrderAtom);
+
+  const selectedPosts: NostrEvent[] = [];
+  for (const id of selectedIdSet) {
+    const p = posts.get(id);
+    if (p) {
+      selectedPosts.push(p);
+    }
+  }
+
+  const compareFn = comparePostsFn(order);
+  return selectedPosts.sort(compareFn).map((p) => p.id);
+});
