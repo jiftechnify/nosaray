@@ -102,6 +102,7 @@ export const startFetchingPosts = async (waybackQuery: WaybackQuery) => {
   }
 
   clearPosts();
+  clearPostSelection();
 
   for await (const ev of EventFetcher.fetchTextNotes(
     dedup([...myData.followList, myData.pubkey]),
@@ -118,18 +119,47 @@ function dedup<T>(arr: T[]) {
   return Array.from(new Set(arr));
 }
 
+/* Selected Post IDs */
 const selectedPostIdSetAtom = atom<Set<string>>(new Set<string>());
+
+export const clearPostSelection = () => {
+  store.set(selectedPostIdSetAtom, new Set<string>());
+};
+
+/**
+ * Getter returns current selection state of the post.
+ *
+ * Setter toggles selection state of the post.
+ */
+export const postSelectionAtomFamily = atomFamily((id: string) =>
+  atom(
+    (get) => get(selectedPostIdSetAtom).has(id),
+    (get, set) => {
+      const prev = get(selectedPostIdSetAtom);
+      const copied = new Set(prev);
+
+      // toggle selection
+      const selected = prev.has(id);
+      if (selected) {
+        copied.delete(id);
+      } else {
+        copied.add(id);
+      }
+      set(selectedPostIdSetAtom, copied);
+    }
+  )
+);
 
 const selectedPostsOrderAtom = atom<PostOrder>("created-at-asc");
 
-const selectedPostIdsAtom = atom<string[]>((get) => {
-  const posts = get(postsAtom);
+const orderedSelectedPostIdsAtom = atom<string[]>((get) => {
+  const allPosts = get(postsAtom);
   const selectedIdSet = get(selectedPostIdSetAtom);
   const order = get(selectedPostsOrderAtom);
 
   const selectedPosts: NostrEvent[] = [];
   for (const id of selectedIdSet) {
-    const p = posts.get(id);
+    const p = allPosts.get(id);
     if (p) {
       selectedPosts.push(p);
     }
@@ -138,3 +168,14 @@ const selectedPostIdsAtom = atom<string[]>((get) => {
   const compareFn = comparePostsFn(order);
   return selectedPosts.sort(compareFn).map((p) => p.id);
 });
+
+export const useSelectedPostIds = (order: PostOrder) => {
+  const setOrder = useSetAtom(selectedPostsOrderAtom);
+  const selectedPostIds = useAtomValue(orderedSelectedPostIdsAtom);
+
+  useEffect(() => {
+    setOrder(order);
+  }, [order, setOrder]);
+
+  return selectedPostIds;
+};

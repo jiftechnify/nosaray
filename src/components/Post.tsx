@@ -11,9 +11,9 @@ import {
   useClipboard,
 } from "@chakra-ui/react";
 import { format, fromUnixTime } from "date-fns";
-import { atom, useAtomValue } from "jotai";
+import { atom, useAtom, useAtomValue } from "jotai";
 import { nip19 } from "nostr-tools";
-import { usePost } from "../states/Posts";
+import { postSelectionAtomFamily, usePost } from "../states/Posts";
 import { profileAtomFamily } from "../states/Profiles";
 
 const toTruncatedNpub = (hexPubkey: string) => {
@@ -29,6 +29,7 @@ type PostProps = {
 
 export const Post: React.FC<PostProps> = ({ id }) => {
   const post = usePost(id);
+  const [isSelected, toggleSelection] = useAtom(postSelectionAtomFamily(id));
   const profile = useAtomValue(
     post ? profileAtomFamily(post.pubkey) : undefAtom
   );
@@ -42,8 +43,11 @@ export const Post: React.FC<PostProps> = ({ id }) => {
       p={3}
       w="100%"
       whiteSpace="pre-wrap"
+      backgroundColor={isSelected ? "purple.100" : "white"}
+      _hover={{ backgroundColor: isSelected ? "purple.200" : "gray.50" }}
+      transition="background-color 0.1s"
       key={post.id}
-      _hover={{ backgroundColor: "gray.50" }}
+      onClick={toggleSelection}
     >
       <Grid
         templateAreas={`"icon author date"
