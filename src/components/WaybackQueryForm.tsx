@@ -14,11 +14,12 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { SingleDatepicker } from "chakra-dayzed-datepicker";
-import { format, getUnixTime, startOfDay, subHours } from "date-fns";
+import { format, subHours } from "date-fns";
 import { useSetAtom } from "jotai";
 import { useMemo, useState } from "react";
 import { ongoingWaybackQueryAtom } from "../states/WaybackQuery";
-import { formatWaybackQuery, TimeRangeUnit } from "../types/WaybackQuery";
+import { TimeRangeUnit, timeRangeUnitLabels } from "../types/TimeRangeUnit";
+import { formatWaybackQuery, WaybackQuery } from "../types/WaybackQuery";
 
 const getNow = () => new Date();
 
@@ -26,34 +27,6 @@ const jaDayNames = "日月火水木金土".split("");
 const jaMonthNames = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(
   (i) => `${i}月`
 );
-
-const SECS_IN_MINUTE = 60;
-const SECS_IN_HOUR = 60 * SECS_IN_MINUTE;
-const SECS_IN_DAY = 24 * SECS_IN_HOUR;
-const sinceUnixtime = (date: Date, timeStr: string): number | undefined => {
-  const [h, m] = timeStr.split(":").map((s) => Number(s));
-  if (h === undefined || m === undefined) {
-    return undefined;
-  }
-  return getUnixTime(startOfDay(date)) + h * SECS_IN_HOUR + m * SECS_IN_MINUTE;
-};
-
-const timeRangeUnitLabels: Record<TimeRangeUnit, string> = {
-  minutes: "分間",
-  hours: "時間",
-  days: "日間",
-};
-
-const secsPerTimeUnit = (unit: TimeRangeUnit): number => {
-  switch (unit) {
-    case "minutes":
-      return SECS_IN_MINUTE;
-    case "hours":
-      return SECS_IN_HOUR;
-    case "days":
-      return SECS_IN_DAY;
-  }
-};
 
 export const WaybackQueryForm: React.FC = () => {
   const now = getNow();
@@ -63,21 +36,16 @@ export const WaybackQueryForm: React.FC = () => {
   );
   const [timeRangeValue, setTimeRangeValue] = useState<number>(1);
   const [timeRangeUnit, setTimeRangeUnit] = useState<TimeRangeUnit>("hours");
-  const queryFromInput = useMemo(() => {
-    if (timeRangeValue === 0) {
-      return undefined;
-    }
-
-    const since = sinceUnixtime(sinceDate, sinceTime);
-    if (since === undefined) {
-      return undefined;
-    }
-    const until = Math.min(
-      since + timeRangeValue * secsPerTimeUnit(timeRangeUnit),
-      getUnixTime(getNow())
-    );
-    return { since, until };
-  }, [sinceDate, sinceTime, timeRangeValue, timeRangeUnit]);
+  const queryFromInput = useMemo(
+    () =>
+      WaybackQuery.fromInputs({
+        sinceDate,
+        sinceTime,
+        timeRangeValue,
+        timeRangeUnit,
+      }),
+    [sinceDate, sinceTime, timeRangeValue, timeRangeUnit]
+  );
 
   const setOngoingQuery = useSetAtom(ongoingWaybackQueryAtom);
   const handleClickWayback = () => {

@@ -1,4 +1,11 @@
-import { format, fromUnixTime, getUnixTime, parseISO } from "date-fns";
+import {
+  format,
+  fromUnixTime,
+  getUnixTime,
+  parseISO,
+  startOfDay,
+} from "date-fns";
+import type { TimeRangeUnit } from "./TimeRangeUnit";
 
 export interface WaybackQuery {
   since: number;
@@ -11,19 +18,16 @@ const formatUnixtime = (unixtime: number) =>
 export const formatWaybackQuery = (q: WaybackQuery): string =>
   `${formatUnixtime(q.since)} 〜 ${formatUnixtime(q.until)}`;
 
-const timeRangeUnits = ["minutes", "hours", "days"] as const;
-export type TimeRangeUnit = typeof timeRangeUnits[number];
-
 const SECS_IN_MINUTE = 60;
 const SECS_IN_HOUR = 60 * SECS_IN_MINUTE;
 const SECS_IN_DAY = 24 * SECS_IN_HOUR;
-// const sinceUnixtime = (date: Date, timeStr: string): number | undefined => {
-//   const [h, m] = timeStr.split(":").map((s) => Number(s));
-//   if (h === undefined || m === undefined) {
-//     return undefined;
-//   }
-//   return getUnixTime(startOfDay(date)) + h * SECS_IN_HOUR + m * SECS_IN_MINUTE;
-// };
+const sinceUnixtime = (date: Date, timeStr: string): number | undefined => {
+  const [h, m] = timeStr.split(":").map((s) => Number(s));
+  if (h === undefined || m === undefined) {
+    return undefined;
+  }
+  return getUnixTime(startOfDay(date)) + h * SECS_IN_HOUR + m * SECS_IN_MINUTE;
+};
 
 const secsPerTimeUnit = (unit: TimeRangeUnit): number => {
   switch (unit) {
@@ -63,6 +67,13 @@ const parseTimeRangeLengthStr = (lenStr: string): number | undefined => {
   }
 };
 
+type WaybackQueryInputs = {
+  sinceDate: Date;
+  sinceTime: string; // HH:mm
+  timeRangeValue: number;
+  timeRangeUnit: TimeRangeUnit;
+};
+
 export class WaybackQuery {
   public static fromURLQueryStr = (
     queryStr: string
@@ -87,5 +98,26 @@ export class WaybackQuery {
     }
     console.log("parseQueryParams", since, len);
     return { since, until: since + len };
+  };
+
+  public static fromInputs = ({
+    sinceDate,
+    sinceTime,
+    timeRangeValue,
+    timeRangeUnit,
+  }: WaybackQueryInputs): WaybackQuery | undefined => {
+    if (timeRangeValue === 0) {
+      return undefined;
+    }
+
+    const since = sinceUnixtime(sinceDate, sinceTime);
+    if (since === undefined) {
+      return undefined;
+    }
+    const until = Math.min(
+      since + timeRangeValue * secsPerTimeUnit(timeRangeUnit),
+      getUnixTime(new Date())
+    );
+    return { since, until };
   };
 }
