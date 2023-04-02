@@ -1,16 +1,36 @@
-import { Flex, HStack, Text } from "@chakra-ui/react";
+import { LinkIcon } from "@chakra-ui/icons";
+import { Box, Flex, HStack, Text } from "@chakra-ui/react";
+import { useAtomValue } from "jotai";
 import { PostQuery, usePostIds } from "../states/Posts";
-import { useOngoingWaybackQuery } from "../states/WaybackQuery";
-import { WaybackQuery } from "../types/WaybackQuery";
+import {
+  useOngoingWaybackQuery,
+  waybackQueryInputsAtom,
+} from "../states/WaybackQuery";
+import { WaybackQuery, WaybackQueryInputs } from "../types/WaybackQuery";
 import { CopyNoteIdsButton } from "./CopyNoteIdsButton";
+import { CopyToClipboardButton } from "./CopyToClipboardButton";
 import { Post } from "./Post";
 
 type PostTimelineProps = {
   postQuery: PostQuery;
 };
 
+const shareLinkFromQueryInputs = (
+  qin: WaybackQueryInputs | undefined
+): string => {
+  const url = new URL(location.href);
+  if (qin) {
+    url.search = WaybackQueryInputs.toURLQuery(qin);
+  } else {
+    url.search = "";
+  }
+  return url.toString();
+};
+
 export const PostTimeline: React.FC<PostTimelineProps> = ({ postQuery }) => {
   const ongoingWaybackQuery = useOngoingWaybackQuery();
+  const qin = useAtomValue(waybackQueryInputsAtom);
+
   const postIds = usePostIds(postQuery);
 
   return (
@@ -21,6 +41,14 @@ export const PostTimeline: React.FC<PostTimelineProps> = ({ postQuery }) => {
             Result
           </Text>
           <Text>{WaybackQuery.format(ongoingWaybackQuery)}</Text>
+          <Box alignSelf="center">
+            <CopyToClipboardButton
+              valueToCopy={shareLinkFromQueryInputs(qin)}
+              tooltipLabel="共有リンクをコピー"
+            >
+              <LinkIcon color="gray.500" />
+            </CopyToClipboardButton>
+          </Box>
         </HStack>
       )}
       {postIds.map((id) => (

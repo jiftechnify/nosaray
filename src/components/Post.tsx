@@ -1,4 +1,4 @@
-import { CheckIcon, CopyIcon, ExternalLinkIcon } from "@chakra-ui/icons";
+import { ExternalLinkIcon } from "@chakra-ui/icons";
 import {
   Avatar,
   Box,
@@ -8,13 +8,13 @@ import {
   HStack,
   Text,
   Tooltip,
-  useClipboard,
 } from "@chakra-ui/react";
 import { format, fromUnixTime } from "date-fns";
 import { atom, useAtom, useAtomValue } from "jotai";
 import { nip19 } from "nostr-tools";
 import { postSelectionAtomFamily, usePost } from "../states/Posts";
 import { profileAtomFamily } from "../states/Profiles";
+import { CopyToClipboardButton } from "./CopyToClipboardButton";
 
 const toTruncatedNpub = (hexPubkey: string) => {
   const npub = nip19.npubEncode(hexPubkey);
@@ -62,8 +62,8 @@ export const Post: React.FC<PostProps> = ({ id }) => {
         </GridItem>
         <GridItem area="author">
           <Text fontSize="1.05em" fontWeight="bold">
-            {profile?.displayName ??
-              profile?.name ??
+            {profile?.displayName ||
+              profile?.name ||
               toTruncatedNpub(post.pubkey)}
           </Text>
         </GridItem>
@@ -77,30 +77,15 @@ export const Post: React.FC<PostProps> = ({ id }) => {
         </GridItem>
       </Grid>
       <HStack position="absolute" top="11px" left="800px" px={2}>
-        {noteId && <CopyNoteIdButton noteId={nip19.noteEncode(post.id)} />}
+        {noteId && (
+          <CopyToClipboardButton
+            valueToCopy={noteId}
+            tooltipLabel="Note IDをコピー"
+          />
+        )}
         {noteId && <OpenViaNosTxButton noteId={noteId} />}
       </HStack>
     </Card>
-  );
-};
-
-type CopyNoteIdButtonProps = {
-  noteId: string; // note1...
-};
-
-const CopyNoteIdButton: React.FC<CopyNoteIdButtonProps> = ({ noteId }) => {
-  const { onCopy, hasCopied } = useClipboard(noteId);
-
-  return (
-    <Tooltip label={hasCopied ? "" : "Note IDをコピー"}>
-      <Box role="button" aria-label="copy note id" onClick={onCopy}>
-        {hasCopied ? (
-          <CheckIcon color="green.300" />
-        ) : (
-          <CopyIcon color="gray.500" />
-        )}
-      </Box>
-    </Tooltip>
   );
 };
 
