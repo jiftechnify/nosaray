@@ -2,8 +2,8 @@ import { atom, getDefaultStore } from "jotai";
 import { atomFamily, atomWithStorage } from "jotai/utils";
 import { EventFetcher } from "../nostr/EventFetcher";
 import { getReadRelays } from "../nostr/utils";
-import type { NostrProfile, NostrProfileWithMeta } from "../types/NostrProfile";
-import type { RelayList } from "../types/RelayList";
+import type { NostrProfileWithMeta } from "../types/NostrProfile";
+import type { UserData } from "../types/UserData";
 import { nip07ExtAtom } from "./Nip07Ext";
 
 const store = getDefaultStore();
@@ -25,13 +25,6 @@ export const profileAtomFamily = atomFamily((pubkey: string) =>
 );
 
 export const myPubkeyAtom = atomWithStorage<string>("my_pubkey", "");
-
-type UserData = {
-  pubkey: string;
-  profile?: NostrProfile;
-  followList?: string[];
-  relayList?: RelayList;
-};
 
 export const myDataInitializedAtom = atom(false);
 

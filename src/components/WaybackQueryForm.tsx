@@ -14,9 +14,11 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { SingleDatepicker } from "chakra-dayzed-datepicker";
-import { format, getUnixTime, parseISO, startOfDay, subHours } from "date-fns";
+import { format, getUnixTime, startOfDay, subHours } from "date-fns";
+import { useSetAtom } from "jotai";
 import { useMemo, useState } from "react";
-import { formatWaybackQuery, WaybackQuery } from "../types/WaybackQuery";
+import { ongoingWaybackQueryAtom } from "../states/WaybackQuery";
+import { formatWaybackQuery, TimeRangeUnit } from "../types/WaybackQuery";
 
 const getNow = () => new Date();
 
@@ -36,9 +38,6 @@ const sinceUnixtime = (date: Date, timeStr: string): number | undefined => {
   return getUnixTime(startOfDay(date)) + h * SECS_IN_HOUR + m * SECS_IN_MINUTE;
 };
 
-const timeRangeUnits = ["minutes", "hours", "days"] as const;
-type TimeRangeUnit = typeof timeRangeUnits[number];
-
 const timeRangeUnitLabels: Record<TimeRangeUnit, string> = {
   minutes: "分間",
   hours: "時間",
@@ -56,69 +55,7 @@ const secsPerTimeUnit = (unit: TimeRangeUnit): number => {
   }
 };
 
-const parseTimeRangeLengthStr = (lenStr: string): number | undefined => {
-  const lenRegexp = /^(\d+)([mhd])$/;
-  const match = lenStr.match(lenRegexp);
-  if (match === null) {
-    return undefined;
-  }
-  const [, valStr, unit] = match;
-  if (valStr === undefined || unit === undefined) {
-    return undefined;
-  }
-
-  const val = Number(valStr);
-  if (isNaN(val)) {
-    return undefined;
-  }
-  switch (unit) {
-    case "m":
-      return val * secsPerTimeUnit("minutes");
-    case "h":
-      return val * secsPerTimeUnit("hours");
-    case "d":
-      return val * secsPerTimeUnit("days");
-    default:
-      return undefined;
-  }
-};
-
-const parseQueryParams = (): WaybackQuery | undefined => {
-  const params = new URLSearchParams(location.search);
-  const sinceStr = params.get("since"); // unixtime in seconds
-  const lenStr = params.get("len"); // <number> ('m' | 'h' | 'd')
-  if (!sinceStr || !lenStr) {
-    return undefined;
-  }
-
-  let since: number;
-  try {
-    since = getUnixTime(parseISO(sinceStr));
-  } catch (err) {
-    console.error("parseQueryParams: 'since' is invalid:", err);
-    return undefined;
-  }
-  const len = parseTimeRangeLengthStr(lenStr);
-  if (isNaN(since) || len === undefined) {
-    return undefined;
-  }
-  console.log("parseQueryParams", since, len);
-  return { since, until: since + len };
-};
-
-const clearQueryParams = () => {
-  const url = new URL(location.href);
-  url.search = "";
-  history.replaceState(null, "", url);
-};
-
-type WaybackQueryFormProps = {
-  onClickWayback: (q: WaybackQuery) => void;
-};
-
-export const WaybackQueryForm: React.FC<WaybackQueryFormProps> = ({
-  onClickWayback,
-}) => {
+export const WaybackQueryForm: React.FC = () => {
   const now = getNow();
   const [sinceDate, setSinceDate] = useState<Date>(subHours(now, 1));
   const [sinceTime, setSinceTime] = useState<string>(
@@ -126,14 +63,7 @@ export const WaybackQueryForm: React.FC<WaybackQueryFormProps> = ({
   );
   const [timeRangeValue, setTimeRangeValue] = useState<number>(1);
   const [timeRangeUnit, setTimeRangeUnit] = useState<TimeRangeUnit>("hours");
-
-  const [timeRangeFromUrl, setTimeRangeFromUrl] = useState(parseQueryParams());
-  const disableInput = timeRangeFromUrl !== undefined;
-
-  const timeRange = useMemo(() => {
-    if (timeRangeFromUrl !== undefined) {
-      return timeRangeFromUrl;
-    }
+  const queryFromInput = useMemo(() => {
     if (timeRangeValue === 0) {
       return undefined;
     }
@@ -147,16 +77,14 @@ export const WaybackQueryForm: React.FC<WaybackQueryFormProps> = ({
       getUnixTime(getNow())
     );
     return { since, until };
-  }, [timeRangeFromUrl, sinceDate, sinceTime, timeRangeValue, timeRangeUnit]);
+  }, [sinceDate, sinceTime, timeRangeValue, timeRangeUnit]);
 
+  const setOngoingQuery = useSetAtom(ongoingWaybackQueryAtom);
   const handleClickWayback = () => {
-    if (timeRange === undefined) {
+    if (queryFromInput === undefined) {
       return;
     }
-    onClickWayback({ ...timeRange });
-
-    setTimeRangeFromUrl(undefined);
-    clearQueryParams();
+    setOngoingQuery({ ...queryFromInput });
   };
 
   return (
@@ -172,13 +100,11 @@ export const WaybackQueryForm: React.FC<WaybackQueryFormProps> = ({
               dayNames: jaDayNames,
               monthNames: jaMonthNames,
             }}
-            disabled={disableInput}
           />
           <Input
             type="time"
             value={sinceTime}
             onChange={(e) => setSinceTime(e.target.value)}
-            disabled={disableInput}
           />
           <Text minW="2em">から</Text>
           <NumberInput
@@ -187,7 +113,6 @@ export const WaybackQueryForm: React.FC<WaybackQueryFormProps> = ({
             allowMouseWheel
             value={timeRangeValue}
             onChange={(_, n) => setTimeRangeValue(isNaN(n) ? 0 : n)}
-            isDisabled={disableInput}
             minW="5em"
           >
             <NumberInputField />
@@ -199,7 +124,6 @@ export const WaybackQueryForm: React.FC<WaybackQueryFormProps> = ({
           <Select
             value={timeRangeUnit}
             onChange={(e) => setTimeRangeUnit(e.target.value as TimeRangeUnit)}
-            isDisabled={disableInput}
           >
             {Object.entries(timeRangeUnitLabels).map(([unit, label]) => (
               <option key={unit} value={unit}>
@@ -208,19 +132,16 @@ export const WaybackQueryForm: React.FC<WaybackQueryFormProps> = ({
             ))}
           </Select>
         </Flex>
-        {timeRange && (
+        {queryFromInput && (
           <HStack>
-            {timeRangeFromUrl && (
-              <Text fontWeight={"bold"}>URLによる指定:</Text>
-            )}
-            <Text>{formatWaybackQuery(timeRange)}</Text>
+            <Text>{formatWaybackQuery(queryFromInput)}</Text>
           </HStack>
         )}
-        {!timeRange && <Text>入力中...</Text>}
+        {!queryFromInput && <Text>入力中...</Text>}
         <Button
           colorScheme="purple"
           onClick={handleClickWayback}
-          isDisabled={timeRange === undefined}
+          isDisabled={queryFromInput === undefined}
         >
           <HStack>
             <RepeatClockIcon />

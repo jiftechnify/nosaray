@@ -8,19 +8,17 @@ import {
   Spinner,
   Text,
 } from "@chakra-ui/react";
-import { useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { loadable } from "jotai/utils";
 import { nip07ExtAtom } from "../states/Nip07Ext";
+import { myPubkeyAtom } from "../states/Profiles";
 
-type LoginPaneProps = {
-  onLogin: (pubkey: string) => void;
-};
-
-export const LoginPane: React.FC<LoginPaneProps> = ({ onLogin }) => {
+export const LoginPane: React.FC = () => {
   const nip07Ext = useAtomValue(loadable(nip07ExtAtom));
+  const setMyPubkey = useSetAtom(myPubkeyAtom);
 
   const handleClickLogin = async () => {
-    onLogin(await window.nostr.getPublicKey());
+    setMyPubkey(await window.nostr.getPublicKey());
   };
 
   const content = (() => {
