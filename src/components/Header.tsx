@@ -39,12 +39,6 @@ export const Header: React.FC = () => {
   );
 };
 
-const clearQueryParams = () => {
-  const url = new URL(location.href);
-  url.search = "";
-  history.replaceState(null, "", url);
-};
-
 const AccountMenu: React.FC = () => {
   const { profile } = useAtomValue(myDataAtom);
   const tipText = profile?.displayName ?? profile?.name ?? "ログイン中";
@@ -53,7 +47,6 @@ const AccountMenu: React.FC = () => {
   const handleClickLogout = () => {
     resetMyPubkey();
     clearAllStates();
-    clearQueryParams();
   };
 
   return (

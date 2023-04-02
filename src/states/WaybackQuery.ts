@@ -1,18 +1,28 @@
-import { atom, getDefaultStore } from "jotai";
+import { atom, getDefaultStore, useAtomValue } from "jotai";
 import { loadable } from "jotai/utils";
 import type { UserData } from "../types/UserData";
-import { WaybackQuery } from "../types/WaybackQuery";
+import { WaybackQuery, WaybackQueryInputs } from "../types/WaybackQuery";
 import { startFetchingPosts } from "./Posts";
 import { myDataAtom } from "./Profiles";
 
 const store = getDefaultStore();
 
-export const ongoingWaybackQueryAtom = atom<WaybackQuery | undefined>(
-  WaybackQuery.fromURLQueryStr(location.search)
+export const waybackQueryInputsAtom = atom<WaybackQueryInputs | undefined>(
+  WaybackQueryInputs.fromURLQuery(location.search)
 );
 
-export const clearOngoingWaybackQuery = () => {
-  store.set(ongoingWaybackQueryAtom, undefined);
+export const clearWaybackQueryInputs = () => {
+  store.set(waybackQueryInputsAtom, undefined);
+};
+
+const ongoingWaybackQueryAtom = atom<WaybackQuery | undefined>((get) => {
+  const inputs = get(waybackQueryInputsAtom);
+  return inputs !== undefined ? WaybackQuery.fromInputs(inputs) : undefined;
+});
+
+export const useOngoingWaybackQuery = () => {
+  const query = useAtomValue(ongoingWaybackQueryAtom);
+  return query;
 };
 
 const ongoingQueryWithMyDataAtom = atom<{
@@ -26,11 +36,21 @@ const ongoingQueryWithMyDataAtom = atom<{
   return {};
 });
 
+const replaceURLQueryStr = (queryStr: string) => {
+  const url = new URL(location.href);
+  url.search = queryStr;
+  history.replaceState(null, "", url);
+};
+
 store.sub(ongoingQueryWithMyDataAtom, async () => {
   const { query, myData } = store.get(ongoingQueryWithMyDataAtom);
-  console.log({ query, myData });
+  const inputs = store.get(waybackQueryInputsAtom);
+  console.log({ inputs, myData });
+
+  replaceURLQueryStr(inputs ? WaybackQueryInputs.toURLQuery(inputs) : "");
+
   if (query !== undefined && myData !== undefined) {
     await startFetchingPosts(query);
   }
-  // TODO: cancel fetching posts if `q` is reset to undefined
+  // TODO: cancel fetching posts if `query` is reset to undefined
 });

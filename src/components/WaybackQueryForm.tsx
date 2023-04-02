@@ -17,9 +17,9 @@ import { SingleDatepicker } from "chakra-dayzed-datepicker";
 import { format, subHours } from "date-fns";
 import { useSetAtom } from "jotai";
 import { useMemo, useState } from "react";
-import { ongoingWaybackQueryAtom } from "../states/WaybackQuery";
-import { TimeRangeUnit, timeRangeUnitLabels } from "../types/TimeRangeUnit";
-import { formatWaybackQuery, WaybackQuery } from "../types/WaybackQuery";
+import { waybackQueryInputsAtom } from "../states/WaybackQuery";
+import type { TimeRangeUnit } from "../types/TimeRangeUnit";
+import { WaybackQuery, WaybackQueryInputs } from "../types/WaybackQuery";
 
 const getNow = () => new Date();
 
@@ -27,6 +27,23 @@ const jaDayNames = "日月火水木金土".split("");
 const jaMonthNames = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(
   (i) => `${i}月`
 );
+
+const timeRangeUnitLabels: Record<TimeRangeUnit, string> = {
+  minutes: "分間",
+  hours: "時間",
+  days: "日間",
+};
+
+const formatQueryFromInputs = (i: WaybackQueryInputs | undefined): string => {
+  if (i === undefined) {
+    return "入力中...";
+  }
+  const q = WaybackQuery.fromInputs(i);
+  if (q === undefined) {
+    return "入力中...";
+  }
+  return WaybackQuery.format(q);
+};
 
 export const WaybackQueryForm: React.FC = () => {
   const now = getNow();
@@ -36,23 +53,22 @@ export const WaybackQueryForm: React.FC = () => {
   );
   const [timeRangeValue, setTimeRangeValue] = useState<number>(1);
   const [timeRangeUnit, setTimeRangeUnit] = useState<TimeRangeUnit>("hours");
-  const queryFromInput = useMemo(
-    () =>
-      WaybackQuery.fromInputs({
-        sinceDate,
-        sinceTime,
-        timeRangeValue,
-        timeRangeUnit,
-      }),
-    [sinceDate, sinceTime, timeRangeValue, timeRangeUnit]
-  );
 
-  const setOngoingQuery = useSetAtom(ongoingWaybackQueryAtom);
+  const setQueryInputs = useSetAtom(waybackQueryInputsAtom);
+  const queryInputs = useMemo(() => {
+    const sinceDatetime = `${format(sinceDate, "yyyy-MM-dd")}T${sinceTime}`;
+    return {
+      sinceDatetime,
+      timeRangeValue,
+      timeRangeUnit,
+    };
+  }, [sinceDate, sinceTime, timeRangeValue, timeRangeUnit]);
+
   const handleClickWayback = () => {
-    if (queryFromInput === undefined) {
+    if (queryInputs === undefined) {
       return;
     }
-    setOngoingQuery({ ...queryFromInput });
+    setQueryInputs(queryInputs);
   };
 
   return (
@@ -100,16 +116,11 @@ export const WaybackQueryForm: React.FC = () => {
             ))}
           </Select>
         </Flex>
-        {queryFromInput && (
-          <HStack>
-            <Text>{formatWaybackQuery(queryFromInput)}</Text>
-          </HStack>
-        )}
-        {!queryFromInput && <Text>入力中...</Text>}
+        <Text>{formatQueryFromInputs(queryInputs)}</Text>
         <Button
           colorScheme="purple"
           onClick={handleClickWayback}
-          isDisabled={queryFromInput === undefined}
+          isDisabled={queryInputs === undefined}
         >
           <HStack>
             <RepeatClockIcon />
