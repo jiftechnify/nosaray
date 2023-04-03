@@ -61,11 +61,19 @@ export const Post: React.FC<PostProps> = ({ id }) => {
           <Avatar size="48px" src={profile?.picture ?? ""} />
         </GridItem>
         <GridItem area="author">
-          <Text fontSize="1.05em" fontWeight="bold">
-            {profile?.displayName ||
-              profile?.name ||
-              toTruncatedNpub(post.pubkey)}
-          </Text>
+          <HStack alignItems="baseline" gap={0}>
+            <Text fontSize="1.05em" fontWeight="bold">
+              {profile?.displayName ||
+                profile?.name ||
+                toTruncatedNpub(post.pubkey)}
+            </Text>
+            {profile?.displayName && profile?.name && (
+              <Text
+                fontSize="0.8em"
+                color="gray.500"
+              >{`@${profile.name}`}</Text>
+            )}
+          </HStack>
         </GridItem>
         <GridItem area="text">
           <Text whiteSpace="pre-wrap">{post.content}</Text>
