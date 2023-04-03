@@ -1,7 +1,6 @@
 import { RepeatClockIcon } from "@chakra-ui/icons";
 import {
   Button,
-  Flex,
   HStack,
   Input,
   NumberDecrementStepper,
@@ -10,6 +9,11 @@ import {
   NumberInputField,
   NumberInputStepper,
   Select,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
   Text,
   VStack,
 } from "@chakra-ui/react";
@@ -28,12 +32,6 @@ const jaMonthNames = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(
   (i) => `${i}月`
 );
 
-const durationUnitLabels: Record<TimeUnit, string> = {
-  minutes: "分間",
-  hours: "時間",
-  days: "日間",
-};
-
 const formatQueryFromInputs = (i: WaybackQueryInputs | undefined): string => {
   if (i === undefined) {
     return "入力中...";
@@ -46,23 +44,17 @@ const formatQueryFromInputs = (i: WaybackQueryInputs | undefined): string => {
 };
 
 export const WaybackQueryForm: React.FC = () => {
-  const now = getNow();
-  const [sinceDate, setSinceDate] = useState<Date>(subHours(now, 1));
-  const [sinceTime, setSinceTime] = useState<string>(
-    format(subHours(now, 1), "HH:mm")
-  );
-  const [durationValue, setDurationValue] = useState<number>(1);
-  const [durationUnit, setDurationUnit] = useState<TimeUnit>("hours");
-
   const setQueryInputs = useSetAtom(waybackQueryInputsAtom);
-  const queryInputs = useMemo(() => {
-    const sinceDatetime = `${format(sinceDate, "yyyy-MM-dd")}T${sinceTime}`;
-    return {
-      sinceDatetime,
-      durationValue,
-      durationUnit,
-    };
-  }, [sinceDate, sinceTime, durationValue, durationUnit]);
+
+  const sinceAndDurForm = useSinceAndDurForm();
+  const untilNowForm = useUntilNowForm();
+
+  const tabs = [
+    { key: "since-dur", label: "始点+期間", form: sinceAndDurForm },
+    { key: "until-now", label: "現在まで", form: untilNowForm },
+  ];
+  const [tabIdx, setTabIdx] = useState(0);
+  const queryInputs = tabs[tabIdx]?.form.queryInputs;
 
   const handleClickWayback = () => {
     if (queryInputs === undefined) {
@@ -72,62 +64,166 @@ export const WaybackQueryForm: React.FC = () => {
   };
 
   return (
-    <div>
-      <VStack>
-        <Flex alignItems="center" justifyContent="start" gap={2}>
-          <SingleDatepicker
-            date={sinceDate}
-            onDateChange={setSinceDate}
-            maxDate={now}
-            configs={{
-              dateFormat: "yyyy/MM/dd",
-              dayNames: jaDayNames,
-              monthNames: jaMonthNames,
-            }}
-          />
-          <Input
-            type="time"
-            value={sinceTime}
-            onChange={(e) => setSinceTime(e.target.value)}
-          />
-          <Text minW="2em">から</Text>
-          <NumberInput
-            min={0}
-            max={100}
-            allowMouseWheel
-            value={durationValue}
-            onChange={(_, n) => setDurationValue(isNaN(n) ? 0 : n)}
-            minW="5em"
-          >
-            <NumberInputField />
-            <NumberInputStepper>
-              <NumberIncrementStepper />
-              <NumberDecrementStepper />
-            </NumberInputStepper>
-          </NumberInput>
-          <Select
-            value={durationUnit}
-            onChange={(e) => setDurationUnit(e.target.value as TimeUnit)}
-          >
-            {Object.entries(durationUnitLabels).map(([unit, label]) => (
-              <option key={unit} value={unit}>
-                {label}
-              </option>
-            ))}
-          </Select>
-        </Flex>
-        <Text>{formatQueryFromInputs(queryInputs)}</Text>
-        <Button
-          colorScheme="purple"
-          onClick={handleClickWayback}
-          isDisabled={queryInputs === undefined}
-        >
-          <HStack>
-            <RepeatClockIcon />
-            <Text>遡る</Text>
-          </HStack>
-        </Button>
-      </VStack>
-    </div>
+    <VStack w="100%">
+      <Tabs w="100%" onChange={(idx) => setTabIdx(idx)}>
+        <TabList>
+          {tabs.map((t) => (
+            <Tab key={t.key}>{t.label}</Tab>
+          ))}
+        </TabList>
+        <TabPanels>
+          {tabs.map((t) => (
+            <TabPanel key={t.key}>{t.form.view}</TabPanel>
+          ))}
+        </TabPanels>
+      </Tabs>
+      <Text>{formatQueryFromInputs(queryInputs)}</Text>
+      <Button
+        colorScheme="purple"
+        onClick={handleClickWayback}
+        isDisabled={queryInputs === undefined}
+      >
+        <HStack>
+          <RepeatClockIcon />
+          <Text>遡る</Text>
+        </HStack>
+      </Button>
+    </VStack>
   );
+};
+
+const durTimeUnitLabels: Record<TimeUnit, string> = {
+  minutes: "分間",
+  hours: "時間",
+  days: "日間",
+};
+
+const useSinceAndDurForm = () => {
+  const now = getNow();
+  const [sinceDate, setSinceDate] = useState<Date>(subHours(now, 1));
+  const [sinceTime, setSinceTime] = useState<string>(
+    format(subHours(now, 1), "HH:mm")
+  );
+  const [durationValue, setDurationValue] = useState<number>(1);
+  const [durationUnit, setDurationUnit] = useState<TimeUnit>("hours");
+
+  const queryInputs: WaybackQueryInputs = useMemo(() => {
+    const sinceDatetime = `${format(sinceDate, "yyyy-MM-dd")}T${sinceTime}`;
+    return {
+      type: "since-and-dur",
+      sinceDatetime,
+      durationValue,
+      durationUnit,
+    };
+  }, [sinceDate, sinceTime, durationValue, durationUnit]);
+
+  const view = (
+    <HStack alignItems="center" justifyContent="center">
+      <SingleDatepicker
+        date={sinceDate}
+        onDateChange={setSinceDate}
+        maxDate={now}
+        configs={{
+          dateFormat: "yyyy/MM/dd",
+          dayNames: jaDayNames,
+          monthNames: jaMonthNames,
+        }}
+        propsConfigs={{
+          inputProps: { w: "140px" },
+        }}
+      />
+      <Input
+        type="time"
+        value={sinceTime}
+        onChange={(e) => setSinceTime(e.target.value)}
+        w="120px"
+      />
+      <Text minW="2em">から</Text>
+      <NumberInput
+        min={0}
+        max={100}
+        allowMouseWheel
+        value={durationValue}
+        onChange={(_, n) => setDurationValue(isNaN(n) ? 0 : n)}
+        w="120px"
+      >
+        <NumberInputField />
+        <NumberInputStepper>
+          <NumberIncrementStepper />
+          <NumberDecrementStepper />
+        </NumberInputStepper>
+      </NumberInput>
+      <Select
+        value={durationUnit}
+        onChange={(e) => setDurationUnit(e.target.value as TimeUnit)}
+        w="fit-content"
+      >
+        {Object.entries(durTimeUnitLabels).map(([unit, label]) => (
+          <option key={unit} value={unit}>
+            {label}
+          </option>
+        ))}
+      </Select>
+    </HStack>
+  );
+
+  return {
+    queryInputs,
+    view,
+  };
+};
+
+const agoTimeUnitLabels: Record<TimeUnit, string> = {
+  minutes: "分",
+  hours: "時間",
+  days: "日",
+};
+
+const useUntilNowForm = () => {
+  const [durationValue, setDurationValue] = useState<number>(1);
+  const [durationUnit, setDurationUnit] = useState<TimeUnit>("hours");
+
+  const queryInputs: WaybackQueryInputs = useMemo(() => {
+    return {
+      type: "until-now",
+      durationValue,
+      durationUnit,
+    };
+  }, [durationValue, durationUnit]);
+
+  const view = (
+    <HStack alignItems="center" justifyContent="center">
+      <NumberInput
+        min={0}
+        max={100}
+        allowMouseWheel
+        value={durationValue}
+        onChange={(_, n) => setDurationValue(isNaN(n) ? 0 : n)}
+        w="120px"
+      >
+        <NumberInputField />
+        <NumberInputStepper>
+          <NumberIncrementStepper />
+          <NumberDecrementStepper />
+        </NumberInputStepper>
+      </NumberInput>
+      <Select
+        w="fit-content"
+        value={durationUnit}
+        onChange={(e) => setDurationUnit(e.target.value as TimeUnit)}
+      >
+        {Object.entries(agoTimeUnitLabels).map(([unit, label]) => (
+          <option key={unit} value={unit}>
+            {label}
+          </option>
+        ))}
+      </Select>
+      <Text>前から現在まで</Text>
+    </HStack>
+  );
+
+  return {
+    queryInputs,
+    view,
+  };
 };
