@@ -65,7 +65,7 @@ export const WaybackQueryForm: React.FC = () => {
 
   return (
     <VStack w="100%">
-      <Tabs w="100%" onChange={(idx) => setTabIdx(idx)}>
+      <Tabs w="100%" colorScheme="purple" onChange={(idx) => setTabIdx(idx)}>
         <TabList>
           {tabs.map((t) => (
             <Tab key={t.key}>{t.label}</Tab>
