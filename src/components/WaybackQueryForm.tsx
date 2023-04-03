@@ -18,7 +18,7 @@ import { format, subHours } from "date-fns";
 import { useSetAtom } from "jotai";
 import { useMemo, useState } from "react";
 import { waybackQueryInputsAtom } from "../states/WaybackQuery";
-import type { TimeRangeUnit } from "../types/TimeRangeUnit";
+import type { TimeUnit } from "../types/TimeUnit";
 import { WaybackQuery, WaybackQueryInputs } from "../types/WaybackQuery";
 
 const getNow = () => new Date();
@@ -28,7 +28,7 @@ const jaMonthNames = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(
   (i) => `${i}月`
 );
 
-const timeRangeUnitLabels: Record<TimeRangeUnit, string> = {
+const durationUnitLabels: Record<TimeUnit, string> = {
   minutes: "分間",
   hours: "時間",
   days: "日間",
@@ -51,18 +51,18 @@ export const WaybackQueryForm: React.FC = () => {
   const [sinceTime, setSinceTime] = useState<string>(
     format(subHours(now, 1), "HH:mm")
   );
-  const [timeRangeValue, setTimeRangeValue] = useState<number>(1);
-  const [timeRangeUnit, setTimeRangeUnit] = useState<TimeRangeUnit>("hours");
+  const [durationValue, setDurationValue] = useState<number>(1);
+  const [durationUnit, setDurationUnit] = useState<TimeUnit>("hours");
 
   const setQueryInputs = useSetAtom(waybackQueryInputsAtom);
   const queryInputs = useMemo(() => {
     const sinceDatetime = `${format(sinceDate, "yyyy-MM-dd")}T${sinceTime}`;
     return {
       sinceDatetime,
-      timeRangeValue,
-      timeRangeUnit,
+      durationValue,
+      durationUnit,
     };
-  }, [sinceDate, sinceTime, timeRangeValue, timeRangeUnit]);
+  }, [sinceDate, sinceTime, durationValue, durationUnit]);
 
   const handleClickWayback = () => {
     if (queryInputs === undefined) {
@@ -95,8 +95,8 @@ export const WaybackQueryForm: React.FC = () => {
             min={0}
             max={100}
             allowMouseWheel
-            value={timeRangeValue}
-            onChange={(_, n) => setTimeRangeValue(isNaN(n) ? 0 : n)}
+            value={durationValue}
+            onChange={(_, n) => setDurationValue(isNaN(n) ? 0 : n)}
             minW="5em"
           >
             <NumberInputField />
@@ -106,10 +106,10 @@ export const WaybackQueryForm: React.FC = () => {
             </NumberInputStepper>
           </NumberInput>
           <Select
-            value={timeRangeUnit}
-            onChange={(e) => setTimeRangeUnit(e.target.value as TimeRangeUnit)}
+            value={durationUnit}
+            onChange={(e) => setDurationUnit(e.target.value as TimeUnit)}
           >
-            {Object.entries(timeRangeUnitLabels).map(([unit, label]) => (
+            {Object.entries(durationUnitLabels).map(([unit, label]) => (
               <option key={unit} value={unit}>
                 {label}
               </option>
