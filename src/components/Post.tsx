@@ -80,7 +80,9 @@ export const Post: React.FC<PostProps> = ({ id }) => {
         {noteId && (
           <CopyToClipboardButton
             valueToCopy={noteId}
-            tooltipLabel="Note IDをコピー"
+            tooltip={{
+              label: "Note IDをコピー",
+            }}
           />
         )}
         {noteId && <OpenViaNosTxButton noteId={noteId} />}

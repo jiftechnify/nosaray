@@ -44,7 +44,7 @@ export const PostTimeline: React.FC<PostTimelineProps> = ({ postQuery }) => {
           <Box alignSelf="center">
             <CopyToClipboardButton
               valueToCopy={shareLinkFromQueryInputs(qin)}
-              tooltipLabel="共有リンクをコピー"
+              tooltip={{ label: "共有リンクをコピー", placement: "top" }}
             >
               <LinkIcon color="gray.500" />
             </CopyToClipboardButton>

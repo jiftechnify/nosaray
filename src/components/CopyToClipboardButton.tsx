@@ -1,15 +1,25 @@
 import { CheckIcon, CopyIcon } from "@chakra-ui/icons";
-import { Box, Tooltip, useClipboard } from "@chakra-ui/react";
+import {
+  Box,
+  PlacementWithLogical,
+  Tooltip,
+  useClipboard,
+} from "@chakra-ui/react";
+
+type TooltipProps = {
+  label: string;
+  placement?: PlacementWithLogical;
+};
 
 type CopyToClipboardButtonProps = {
   valueToCopy: string;
-  tooltipLabel?: string;
+  tooltip?: TooltipProps;
   children?: React.ReactNode;
 };
 
 export const CopyToClipboardButton: React.FC<CopyToClipboardButtonProps> = ({
   valueToCopy,
-  tooltipLabel,
+  tooltip,
   children,
 }) => {
   const { onCopy, hasCopied } = useClipboard(valueToCopy, 500);
@@ -23,8 +33,13 @@ export const CopyToClipboardButton: React.FC<CopyToClipboardButtonProps> = ({
     </Box>
   );
 
-  return tooltipLabel ? (
-    <Tooltip label={hasCopied ? "" : tooltipLabel}>{body}</Tooltip>
+  return tooltip ? (
+    <Tooltip
+      label={hasCopied ? "" : tooltip.label}
+      placement={tooltip.placement}
+    >
+      {body}
+    </Tooltip>
   ) : (
     body
   );
