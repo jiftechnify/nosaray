@@ -12,8 +12,10 @@ import {
 import { format, fromUnixTime } from "date-fns";
 import { atom, useAtom, useAtomValue } from "jotai";
 import { nip19 } from "nostr-tools";
+import { postDisplayModeAtom } from "../states/Config";
 import { postSelectionAtomFamily, usePost } from "../states/Posts";
 import { profileAtomFamily } from "../states/Profiles";
+import type { NostrProfileWithMeta } from "../types/NostrProfile";
 import { CopyToClipboardButton } from "./CopyToClipboardButton";
 
 const toTruncatedNpub = (hexPubkey: string) => {
@@ -58,22 +60,10 @@ export const Post: React.FC<PostProps> = ({ id }) => {
         onClick={toggleSelection} // TODO
       >
         <GridItem area="icon">
-          <Avatar size="48px" src={profile?.picture ?? ""} />
+          <PostAuthorIcon profile={profile} pubkey={post.pubkey} />
         </GridItem>
         <GridItem area="author">
-          <HStack alignItems="baseline" gap={0}>
-            <Text fontSize="1.05em" fontWeight="bold">
-              {profile?.displayName ||
-                profile?.name ||
-                toTruncatedNpub(post.pubkey)}
-            </Text>
-            {profile?.displayName && profile?.name && (
-              <Text
-                fontSize="0.8em"
-                color="gray.500"
-              >{`@${profile.name}`}</Text>
-            )}
-          </HStack>
+          <PostAuthorName profile={profile} pubkey={post.pubkey} />
         </GridItem>
         <GridItem area="text">
           <Text whiteSpace="pre-wrap">{post.content}</Text>
@@ -96,6 +86,57 @@ export const Post: React.FC<PostProps> = ({ id }) => {
         {noteId && <OpenViaNosTxButton noteId={noteId} />}
       </HStack>
     </Card>
+  );
+};
+
+type PostAuthorIconProps = {
+  profile: NostrProfileWithMeta | undefined;
+  pubkey: string;
+};
+const PostAuthorIcon: React.FC<PostAuthorIconProps> = ({ profile, pubkey }) => {
+  const mode = useAtomValue(postDisplayModeAtom);
+
+  switch (mode) {
+    case "normal":
+      return <Avatar size="48px" src={profile?.picture ?? ""} />;
+    case "pubkey-hex-color":
+      return (
+        <svg viewBox="0 0 48 48">
+          <circle cx="24" cy="24" r="24" fill={`#${pubkey.slice(0, 8)}`} />
+        </svg>
+      );
+  }
+};
+
+type PostAuthorNameProps = {
+  profile: NostrProfileWithMeta | undefined;
+  pubkey: string;
+};
+const PostAuthorName: React.FC<PostAuthorNameProps> = ({ profile, pubkey }) => {
+  const mode = useAtomValue(postDisplayModeAtom);
+  const showScreenName = mode === "normal";
+
+  const dispName = (() => {
+    switch (mode) {
+      case "normal":
+        return profile?.displayName || profile?.name || toTruncatedNpub(pubkey);
+      case "pubkey-hex-color":
+        return `#${pubkey.slice(0, 8)}`;
+    }
+  })();
+
+  const screenNameText =
+    showScreenName && profile?.displayName && profile?.name ? (
+      <Text fontSize="0.8em" color="gray.500">{`@${profile.name}`}</Text>
+    ) : null;
+
+  return (
+    <HStack alignItems="baseline" gap={0}>
+      <Text fontSize="1.05em" fontWeight="bold">
+        {dispName}
+      </Text>
+      {screenNameText}
+    </HStack>
   );
 };
 

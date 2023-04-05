@@ -16,6 +16,7 @@ import { useResetAtom } from "jotai/utils";
 import { Suspense } from "react";
 import { clearAllStates } from "../states";
 import { myDataAtom, myPubkeyAtom } from "../states/Profiles";
+import { HiddenMenu } from "./HiddenMenu";
 
 export const Header: React.FC = () => {
   const isLoggedIn = useAtomValue(myPubkeyAtom) !== "";
@@ -35,6 +36,9 @@ export const Header: React.FC = () => {
           </Box>
         )}
       </Suspense>
+      <Box position="fixed" left="0" top="0">
+        <HiddenMenu />
+      </Box>
     </Flex>
   );
 };
