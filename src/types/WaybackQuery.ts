@@ -202,10 +202,8 @@ export const WaybackQuery = {
         if (inputs.durationValue === 0) {
           return undefined;
         }
-        console.log(inputs);
         const now = getUnixTime(endOfMinute(new Date()));
         const since = now - durationInSecs(inputs);
-        console.log({ since, now });
         return { since, until: now };
       }
     }

@@ -45,7 +45,6 @@ const replaceURLQueryStr = (queryStr: string) => {
 store.sub(ongoingQueryWithMyDataAtom, async () => {
   const { query, myData } = store.get(ongoingQueryWithMyDataAtom);
   const inputs = store.get(waybackQueryInputsAtom);
-  console.log({ inputs, myData });
 
   replaceURLQueryStr(inputs ? WaybackQueryInputs.toURLQuery(inputs) : "");
 
