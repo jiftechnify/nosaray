@@ -18,9 +18,16 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { SingleDatepicker } from "chakra-dayzed-datepicker";
-import { format, subHours } from "date-fns";
+import {
+  addMinutes,
+  differenceInMilliseconds,
+  format,
+  getUnixTime,
+  startOfMinute,
+  subHours,
+} from "date-fns";
 import { useSetAtom } from "jotai";
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { waybackQueryInputsAtom } from "../states/WaybackQuery";
 import type { TimeUnit } from "../types/TimeUnit";
 import { WaybackQuery, WaybackQueryInputs } from "../types/WaybackQuery";
@@ -182,14 +189,17 @@ const agoTimeUnitLabels: Record<TimeUnit, string> = {
 const useUntilNowForm = () => {
   const [durationValue, setDurationValue] = useState<number>(1);
   const [durationUnit, setDurationUnit] = useState<TimeUnit>("hours");
+  const tick = useTickOnStartOfMinute();
 
   const queryInputs: WaybackQueryInputs = useMemo(() => {
+    void tick; // tick is only used to trigger update
+
     return {
       type: "until-now",
       durationValue,
       durationUnit,
     };
-  }, [durationValue, durationUnit]);
+  }, [durationValue, durationUnit, tick]);
 
   const view = (
     <HStack alignItems="center" justifyContent="center">
@@ -226,4 +236,32 @@ const useUntilNowForm = () => {
     queryInputs,
     view,
   };
+};
+
+// returns timestamp that will be updated on every start of minute.
+// can be used to trigger action every minute.
+const useTickOnStartOfMinute = () => {
+  const [timestamp, setTimestamp] = useState(getUnixTime(getNow()));
+  const timer = useRef<number | undefined>(undefined);
+
+  const setNextTick = useCallback(() => {
+    const currTime = getNow();
+    const nextTickTime = startOfMinute(addMinutes(currTime, 1));
+
+    timer.current = setTimeout(() => {
+      setTimestamp(getUnixTime(getNow()));
+      setNextTick();
+    }, differenceInMilliseconds(nextTickTime, currTime));
+  }, []);
+
+  useEffect(() => {
+    setNextTick();
+    return () => {
+      if (timer.current !== undefined) {
+        clearTimeout(timer.current);
+      }
+    };
+  }, [setNextTick]);
+
+  return timestamp;
 };
