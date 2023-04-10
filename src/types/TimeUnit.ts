@@ -1,8 +1,8 @@
 const timeUnits = ["minutes", "hours", "days"] as const;
-export type TimeUnit = typeof timeUnits[number];
+export type TimeUnit = (typeof timeUnits)[number];
 
 const shortTimeUnits = ["m", "h", "d"] as const;
-type ShortTimeUnit = typeof shortTimeUnits[number];
+type ShortTimeUnit = (typeof shortTimeUnits)[number];
 
 const timeUnitConversions: Record<TimeUnit, ShortTimeUnit> &
   Record<ShortTimeUnit, TimeUnit> = {
