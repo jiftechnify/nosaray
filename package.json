@@ -45,7 +45,7 @@
     "esbuild": "^0.17.5",
     "esbuild-register": "^3.3.3",
     "eslint": "^8.18.0",
-    "eslint-config-prettier": "^8.5.0",
+    "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-jsx-a11y": "^6.7.1",
     "eslint-plugin-react": "^7.32.2",
