@@ -25,7 +25,7 @@
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.11.0",
     "chakra-dayzed-datepicker": "^0.2.7",
-    "date-fns": "^2.29.3",
+    "date-fns": "^2.30.0",
     "dayzed": "^3.2.3",
     "framer-motion": "^10.12.11",
     "jotai": "^2.0.3",
