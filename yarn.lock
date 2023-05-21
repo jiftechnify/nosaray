@@ -3174,10 +3174,10 @@ javascript-stringify@^2.1.0:
   resolved "https://registry.yarnpkg.com/javascript-stringify/-/javascript-stringify-2.1.0.tgz#27c76539be14d8bd128219a2d731b09337904e79"
   integrity sha512-JVAfqNPTvNq3sB/VHQJAFxN/sPgKnsKrCwyRt15zwNCdrMMJDdcEOdubuy+DuJYYdm0ox1J4uzEuYKkN+9yhVg==
 
-jotai-devtools@^0.5.2:
-  version "0.5.2"
-  resolved "https://registry.yarnpkg.com/jotai-devtools/-/jotai-devtools-0.5.2.tgz#29b6828003c79503650d18b66b21dbe37b0c47f2"
-  integrity sha512-2juCqNYURUC26bjAA8huWI0x8h9NeqKDjdu3O1sqNvLbzChXmK/sh1AO6o5I+S8MRT05l7fu6BqKoGsMfqh95Q==
+jotai-devtools@^0.5.3:
+  version "0.5.3"
+  resolved "https://registry.yarnpkg.com/jotai-devtools/-/jotai-devtools-0.5.3.tgz#827e63cc881845e0ff468bc52bfaf14c2b2060ac"
+  integrity sha512-VWfRfTu3jEgR828boLfVtP5X8hC9X3LsjT+ER67HzcaL08HvEoNb1NaVu0spX1fC5xUIEKibCrMspnHHdsePyw==
   dependencies:
     "@mantine/core" "^6.0.9"
     "@mantine/hooks" "^6.0.9"
