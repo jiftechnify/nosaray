@@ -28,7 +28,7 @@
     "date-fns": "^2.30.0",
     "dayzed": "^3.2.3",
     "framer-motion": "^10.12.11",
-    "jotai": "^2.0.3",
+    "jotai": "^2.2.1",
     "jotai-devtools": "^0.5.3",
     "nostr-fetch": "^0.4.4",
     "nostr-tools": "^1.7.5",
