@@ -75,11 +75,8 @@ export class EventFetcher {
           .filter((t) => t.length >= 2 && t[0] === "p")
           .map((t) => t[1] as string)
       : [];
-    const relayList = k10002
-      ? parseRelayListInKind10002(k10002)
-      : k3
-      ? parseRelayListInKind3(k3)
-      : {};
+
+    const relayList = parseRelayList([k3, k10002]);
 
     return { followList, relayList };
   }
@@ -99,6 +96,27 @@ export class EventFetcher {
     }
   }
 }
+
+const parseRelayList = (evs: (NostrEvent | undefined)[]): RelayList => {
+  const relayListEvs = evs.filter(
+    (ev): ev is NostrEvent => ev !== undefined && [3, 10002].includes(ev.kind)
+  );
+  if (relayListEvs.length === 0) {
+    return {};
+  }
+  const latest = relayListEvs.sort(
+    (a, b) => b.created_at - a.created_at
+  )[0] as NostrEvent;
+  switch (latest.kind) {
+    case eventKind.contacts:
+      return parseRelayListInKind3(latest);
+    case eventKind.relayList:
+      return parseRelayListInKind10002(latest);
+    default:
+      console.error("parseRelayList: unreachable");
+      return {};
+  }
+};
 
 const parseRelayListInKind3 = (ev: NostrEvent): RelayList => {
   try {
