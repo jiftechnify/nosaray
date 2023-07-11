@@ -92,7 +92,9 @@ export class EventFetcher {
       timeRangeFilter
     );
     for await (const ev of evIter) {
-      yield ev;
+      if (ev.kind === eventKind.text) {
+        yield ev;
+      }
     }
   }
 }
