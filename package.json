@@ -22,7 +22,7 @@
   "dependencies": {
     "@chakra-ui/icons": "^2.0.17",
     "@chakra-ui/react": "^2.5.2",
-    "@emotion/react": "^11.10.6",
+    "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "chakra-dayzed-datepicker": "^0.2.7",
     "date-fns": "^2.30.0",
