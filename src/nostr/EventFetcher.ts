@@ -8,7 +8,7 @@ import type { NostrProfileWithMeta } from "../types/NostrProfile";
 import type { RelayList } from "../types/RelayList";
 import { parseNostrProfile } from "./ProfileParser";
 
-const fetcher = new NostrFetcher({ enableDebugLog: true });
+const fetcher = NostrFetcher.init({ minLogLevel: "info" });
 
 const bootstrapRelays = [
   "wss://relay-jp.nostr.wirednet.jp",
@@ -24,9 +24,10 @@ export class EventFetcher {
     pubkey: string,
     relayUrls: string[]
   ): Promise<NostrProfileWithMeta | undefined> {
-    const ev = await fetcher.fetchLastEvent(this.withBootstraps(relayUrls), [
-      { authors: [pubkey], kinds: [eventKind.metadata] },
-    ]);
+    const ev = await fetcher.fetchLastEvent(this.withBootstraps(relayUrls), {
+      authors: [pubkey],
+      kinds: [eventKind.metadata],
+    });
     if (ev === undefined) {
       return undefined;
     }
@@ -41,9 +42,9 @@ export class EventFetcher {
     pubkeys: string[],
     relayUrls: string[]
   ): AsyncIterable<NostrProfileWithMeta> {
-    const evIter = await fetcher.allEventsIterator(
+    const evIter = fetcher.allEventsIterator(
       this.withBootstraps(relayUrls),
-      [{ authors: pubkeys, kinds: [eventKind.metadata] }],
+      { authors: pubkeys, kinds: [eventKind.metadata] },
       {}
     );
 
@@ -62,9 +63,10 @@ export class EventFetcher {
   ): Promise<{ followList: string[]; relayList: RelayList }> {
     const [k3, k10002] = await Promise.all(
       [eventKind.contacts, eventKind.relayList].map(async (kind) =>
-        fetcher.fetchLastEvent(this.withBootstraps(relayUrls), [
-          { authors: [pubkey], kinds: [kind] },
-        ])
+        fetcher.fetchLastEvent(this.withBootstraps(relayUrls), {
+          authors: [pubkey],
+          kinds: [kind],
+        })
       )
     );
 
@@ -87,9 +89,9 @@ export class EventFetcher {
     timeRangeFilter: FetchTimeRangeFilter,
     relayUrls: string[]
   ): AsyncIterable<NostrEvent> {
-    const evIter = await fetcher.allEventsIterator(
+    const evIter = fetcher.allEventsIterator(
       this.withBootstraps(relayUrls),
-      [{ authors: pubkeys, kinds: [eventKind.text] }],
+      { authors: pubkeys, kinds: [eventKind.text] },
       timeRangeFilter
     );
     for await (const ev of evIter) {
