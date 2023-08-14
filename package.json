@@ -29,7 +29,7 @@
     "dayzed": "^3.2.3",
     "framer-motion": "^10.12.22",
     "jotai": "^2.2.3",
-    "jotai-devtools": "^0.5.3",
+    "jotai-devtools": "^0.6.1",
     "nostr-fetch": "^0.12.2",
     "nostr-tools": "^1.7.5",
     "react": "^18.2.0",
