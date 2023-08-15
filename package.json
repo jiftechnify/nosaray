@@ -31,7 +31,7 @@
     "jotai": "^2.2.3",
     "jotai-devtools": "^0.6.1",
     "nostr-fetch": "^0.12.2",
-    "nostr-tools": "^1.7.5",
+    "nostr-tools": "^1.14.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
