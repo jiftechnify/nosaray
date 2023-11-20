@@ -44,7 +44,7 @@
     "@vitejs/plugin-react": "^4.0.3",
     "esbuild": "^0.19.2",
     "esbuild-register": "^3.3.3",
-    "eslint": "^8.52.0",
+    "eslint": "^8.54.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-jsx-a11y": "^6.7.1",
