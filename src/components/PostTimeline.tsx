@@ -7,7 +7,7 @@ import {
   waybackQueryInputsAtom,
 } from "../states/WaybackQuery";
 import { WaybackQuery, WaybackQueryInputs } from "../types/WaybackQuery";
-import { CopyNoteIdsButton } from "./CopyNoteIdsButton";
+import { CopyNeventsButton } from "./CopyNeventsButton";
 import { CopyToClipboardButton } from "./CopyToClipboardButton";
 import { Post } from "./Post";
 
@@ -54,7 +54,7 @@ export const PostTimeline: React.FC<PostTimelineProps> = ({ postQuery }) => {
       {postIds.map((id) => (
         <Post key={id} id={id} />
       ))}
-      <CopyNoteIdsButton
+      <CopyNeventsButton
         position="fixed"
         bottom="16px"
         ml="876px"

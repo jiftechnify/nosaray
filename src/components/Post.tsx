@@ -11,7 +11,7 @@ import {
 } from "@chakra-ui/react";
 import { format, fromUnixTime } from "date-fns";
 import { atom, useAtom, useAtomValue } from "jotai";
-import { nip19 } from "nostr-tools";
+import { neventEncode, noteEncode, npubEncode } from "nostr-tools/nip19";
 import { postDisplayModeAtom } from "../states/Config";
 import { postSelectionAtomFamily, usePost } from "../states/Posts";
 import { profileAtomFamily } from "../states/Profiles";
@@ -19,7 +19,7 @@ import type { NostrProfileWithMeta } from "../types/NostrProfile";
 import { CopyToClipboardButton } from "./CopyToClipboardButton";
 
 const toTruncatedNpub = (hexPubkey: string) => {
-  const npub = nip19.npubEncode(hexPubkey);
+  const npub = npubEncode(hexPubkey);
   return `${npub.slice(0, 8)}:${npub.slice(-8)}`;
 };
 
@@ -35,7 +35,8 @@ export const Post: React.FC<PostProps> = ({ id }) => {
   const profile = useAtomValue(
     post ? profileAtomFamily(post.pubkey) : undefAtom
   );
-  const noteId = post?.id ? nip19.noteEncode(post.id) : undefined;
+  const noteId = post?.id ? noteEncode(post.id) : undefined;
+  const nevent = post?.id ? neventEncode({ id: post.id }) : undefined;
 
   if (post === undefined) {
     return null;
@@ -75,11 +76,11 @@ export const Post: React.FC<PostProps> = ({ id }) => {
         </GridItem>
       </Grid>
       <HStack position="absolute" top="11px" left="800px" px={2}>
-        {noteId && (
+        {nevent && (
           <CopyToClipboardButton
-            valueToCopy={noteId}
+            valueToCopy={nevent}
             tooltip={{
-              label: "Note IDをコピー",
+              label: "投稿ID(nevent)をコピー",
             }}
           />
         )}

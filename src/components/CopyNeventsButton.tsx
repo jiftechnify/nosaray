@@ -5,23 +5,23 @@ import {
   Tooltip,
   useClipboard,
 } from "@chakra-ui/react";
-import { nip19 } from "nostr-tools";
+import { neventEncode } from "nostr-tools/nip19";
 import { clearPostSelection, useSelectedPostIds } from "../states/Posts";
 
-type CopyNoteIdsButtonProps = Omit<
+type CopyNeventsButtonProps = Omit<
   IconButtonProps,
   "aria-label" | "icon" | "onClick"
 >;
 
-export const CopyNoteIdsButton: React.FC<CopyNoteIdsButtonProps> = (props) => {
+export const CopyNeventsButton: React.FC<CopyNeventsButtonProps> = (props) => {
   const selectedIds = useSelectedPostIds("created-at-asc");
   const lineSeparatedIds = selectedIds
-    .map((id) => nip19.noteEncode(id))
+    .map((id) => neventEncode({ id }))
     .join("\n");
   const { onCopy } = useClipboard(lineSeparatedIds);
 
   return selectedIds.length > 0 ? (
-    <Tooltip label="選択投稿のIDを一括コピー">
+    <Tooltip label="選択投稿のID(nevent)を一括コピー">
       <IconButton
         aria-label="copy note ids of selected posts"
         icon={<CopyIcon />}
