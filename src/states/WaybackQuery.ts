@@ -8,7 +8,7 @@ import { myDataAtom } from "./Profiles";
 const store = getDefaultStore();
 
 export const waybackQueryInputsAtom = atom<WaybackQueryInputs | undefined>(
-  WaybackQueryInputs.fromURLQuery(location.search)
+  WaybackQueryInputs.fromURLQuery(location.search),
 );
 
 export const clearWaybackQueryInputs = () => {

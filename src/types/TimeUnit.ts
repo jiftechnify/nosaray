@@ -4,8 +4,7 @@ export type TimeUnit = (typeof timeUnits)[number];
 const shortTimeUnits = ["m", "h", "d"] as const;
 type ShortTimeUnit = (typeof shortTimeUnits)[number];
 
-const timeUnitConversions: Record<TimeUnit, ShortTimeUnit> &
-  Record<ShortTimeUnit, TimeUnit> = {
+const timeUnitConversions: Record<TimeUnit, ShortTimeUnit> & Record<ShortTimeUnit, TimeUnit> = {
   minutes: "m",
   m: "minutes",
   hours: "h",

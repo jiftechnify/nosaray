@@ -34,15 +34,13 @@ const postAtomFamily = atomFamily((eventId: string) =>
         copied.delete(id);
         set(postsAtom, copied);
       }
-    }
-  )
+    },
+  ),
 );
 
 export type PostOrder = "created-at-desc" | "created-at-asc";
 
-const comparePostsFn = (
-  order: PostOrder
-): ((a: NostrEvent, b: NostrEvent) => number) => {
+const comparePostsFn = (order: PostOrder): ((a: NostrEvent, b: NostrEvent) => number) => {
   switch (order) {
     case "created-at-desc":
       return (a, b) => b.created_at - a.created_at;
@@ -89,15 +87,9 @@ export const clearPosts = () => {
 
 export const startFetchingPosts = async (waybackQuery: WaybackQuery) => {
   const myData = await store.get(myDataAtom);
-  const readRelays = myData?.relayList
-    ? getReadRelays(myData.relayList)
-    : undefined;
+  const readRelays = myData?.relayList ? getReadRelays(myData.relayList) : undefined;
 
-  if (
-    myData.pubkey === "" ||
-    myData.followList === undefined ||
-    readRelays === undefined
-  ) {
+  if (myData.pubkey === "" || myData.followList === undefined || readRelays === undefined) {
     return;
   }
 
@@ -107,7 +99,7 @@ export const startFetchingPosts = async (waybackQuery: WaybackQuery) => {
   for await (const ev of EventFetcher.fetchTextNotes(
     dedup([...myData.followList, myData.pubkey]),
     waybackQuery,
-    readRelays
+    readRelays,
   )) {
     const { id } = ev;
     const setterAtom = postAtomFamily(id);
@@ -146,8 +138,8 @@ export const postSelectionAtomFamily = atomFamily((id: string) =>
         copied.add(id);
       }
       set(selectedPostIdSetAtom, copied);
-    }
-  )
+    },
+  ),
 );
 
 const selectedPostsOrderAtom = atom<PostOrder>("created-at-asc");

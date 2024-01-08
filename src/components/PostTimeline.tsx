@@ -2,10 +2,7 @@ import { LinkIcon } from "@chakra-ui/icons";
 import { Box, Flex, HStack, Text } from "@chakra-ui/react";
 import { useAtomValue } from "jotai";
 import { PostQuery, usePostIds } from "../states/Posts";
-import {
-  useOngoingWaybackQuery,
-  waybackQueryInputsAtom,
-} from "../states/WaybackQuery";
+import { useOngoingWaybackQuery, waybackQueryInputsAtom } from "../states/WaybackQuery";
 import { WaybackQuery, WaybackQueryInputs } from "../types/WaybackQuery";
 import { CopyNeventsButton } from "./CopyNeventsButton";
 import { CopyToClipboardButton } from "./CopyToClipboardButton";
@@ -15,9 +12,7 @@ type PostTimelineProps = {
   postQuery: PostQuery;
 };
 
-const shareLinkFromQueryInputs = (
-  qin: WaybackQueryInputs | undefined
-): string => {
+const shareLinkFromQueryInputs = (qin: WaybackQueryInputs | undefined): string => {
   const url = new URL(location.href);
   if (qin) {
     url.search = WaybackQueryInputs.toURLQuery(qin);
@@ -54,14 +49,7 @@ export const PostTimeline: React.FC<PostTimelineProps> = ({ postQuery }) => {
       {postIds.map((id) => (
         <Post key={id} id={id} />
       ))}
-      <CopyNeventsButton
-        position="fixed"
-        bottom="16px"
-        ml="876px"
-        size="lg"
-        colorScheme="purple"
-        isRound
-      />
+      <CopyNeventsButton position="fixed" bottom="16px" ml="876px" size="lg" colorScheme="purple" isRound />
     </Flex>
   );
 };

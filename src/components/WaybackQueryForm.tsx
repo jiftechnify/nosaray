@@ -18,14 +18,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { SingleDatepicker } from "chakra-dayzed-datepicker";
-import {
-  addMinutes,
-  differenceInMilliseconds,
-  format,
-  getUnixTime,
-  startOfMinute,
-  subHours,
-} from "date-fns";
+import { addMinutes, differenceInMilliseconds, format, getUnixTime, startOfMinute, subHours } from "date-fns";
 import { useSetAtom } from "jotai";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { waybackQueryInputsAtom } from "../states/WaybackQuery";
@@ -35,9 +28,7 @@ import { WaybackQuery, WaybackQueryInputs } from "../types/WaybackQuery";
 const getNow = () => new Date();
 
 const jaDayNames = "日月火水木金土".split("");
-const jaMonthNames = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(
-  (i) => `${i}月`
-);
+const jaMonthNames = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((i) => `${i}月`);
 
 const formatQueryFromInputs = (i: WaybackQueryInputs | undefined): string => {
   if (i === undefined) {
@@ -85,11 +76,7 @@ export const WaybackQueryForm: React.FC = () => {
         </TabPanels>
       </Tabs>
       <Text>{formatQueryFromInputs(queryInputs)}</Text>
-      <Button
-        colorScheme="purple"
-        onClick={handleClickWayback}
-        isDisabled={queryInputs === undefined}
-      >
+      <Button colorScheme="purple" onClick={handleClickWayback} isDisabled={queryInputs === undefined}>
         <HStack>
           <RepeatClockIcon />
           <Text>遡る</Text>
@@ -108,9 +95,7 @@ const durTimeUnitLabels: Record<TimeUnit, string> = {
 const useSinceAndDurForm = () => {
   const now = getNow();
   const [sinceDate, setSinceDate] = useState<Date>(subHours(now, 1));
-  const [sinceTime, setSinceTime] = useState<string>(
-    format(subHours(now, 1), "HH:mm")
-  );
+  const [sinceTime, setSinceTime] = useState<string>(format(subHours(now, 1), "HH:mm"));
   const [durationValue, setDurationValue] = useState<number>(1);
   const [durationUnit, setDurationUnit] = useState<TimeUnit>("hours");
 
@@ -139,12 +124,7 @@ const useSinceAndDurForm = () => {
           inputProps: { w: "140px" },
         }}
       />
-      <Input
-        type="time"
-        value={sinceTime}
-        onChange={(e) => setSinceTime(e.target.value)}
-        w="120px"
-      />
+      <Input type="time" value={sinceTime} onChange={(e) => setSinceTime(e.target.value)} w="120px" />
       <Text minW="2em">から</Text>
       <NumberInput
         min={0}
@@ -160,11 +140,7 @@ const useSinceAndDurForm = () => {
           <NumberDecrementStepper />
         </NumberInputStepper>
       </NumberInput>
-      <Select
-        value={durationUnit}
-        onChange={(e) => setDurationUnit(e.target.value as TimeUnit)}
-        w="fit-content"
-      >
+      <Select value={durationUnit} onChange={(e) => setDurationUnit(e.target.value as TimeUnit)} w="fit-content">
         {Object.entries(durTimeUnitLabels).map(([unit, label]) => (
           <option key={unit} value={unit}>
             {label}
@@ -217,11 +193,7 @@ const useUntilNowForm = () => {
           <NumberDecrementStepper />
         </NumberInputStepper>
       </NumberInput>
-      <Select
-        w="fit-content"
-        value={durationUnit}
-        onChange={(e) => setDurationUnit(e.target.value as TimeUnit)}
-      >
+      <Select w="fit-content" value={durationUnit} onChange={(e) => setDurationUnit(e.target.value as TimeUnit)}>
         {Object.entries(agoTimeUnitLabels).map(([unit, label]) => (
           <option key={unit} value={unit}>
             {label}
@@ -248,10 +220,13 @@ const useTickOnStartOfMinute = () => {
     const currTime = getNow();
     const nextTickTime = startOfMinute(addMinutes(currTime, 1));
 
-    timer.current = setTimeout(() => {
-      setTimestamp(getUnixTime(getNow()));
-      setNextTick();
-    }, differenceInMilliseconds(nextTickTime, currTime));
+    timer.current = setTimeout(
+      () => {
+        setTimestamp(getUnixTime(getNow()));
+        setNextTick();
+      },
+      differenceInMilliseconds(nextTickTime, currTime),
+    );
   }, []);
 
   useEffect(() => {

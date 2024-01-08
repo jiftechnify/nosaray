@@ -1,14 +1,5 @@
 import { ExternalLinkIcon } from "@chakra-ui/icons";
-import {
-  Avatar,
-  Box,
-  Card,
-  Grid,
-  GridItem,
-  HStack,
-  Text,
-  Tooltip,
-} from "@chakra-ui/react";
+import { Avatar, Box, Card, Grid, GridItem, HStack, Text, Tooltip } from "@chakra-ui/react";
 import { format, fromUnixTime } from "date-fns";
 import { atom, useAtom, useAtomValue } from "jotai";
 import { neventEncode, noteEncode, npubEncode } from "nostr-tools/nip19";
@@ -32,9 +23,7 @@ type PostProps = {
 export const Post: React.FC<PostProps> = ({ id }) => {
   const post = usePost(id);
   const [isSelected, toggleSelection] = useAtom(postSelectionAtomFamily(id));
-  const profile = useAtomValue(
-    post ? profileAtomFamily(post.pubkey) : undefAtom
-  );
+  const profile = useAtomValue(post ? profileAtomFamily(post.pubkey) : undefAtom);
   const noteId = post?.id ? noteEncode(post.id) : undefined;
   const nevent = post?.id ? neventEncode({ id: post.id }) : undefined;
 
@@ -70,9 +59,7 @@ export const Post: React.FC<PostProps> = ({ id }) => {
           <Text whiteSpace="pre-wrap">{post.content}</Text>
         </GridItem>
         <GridItem area="date" justifySelf="end">
-          <Text color="gray.600">
-            {format(fromUnixTime(post.created_at), "M/d HH:mm:ss")}
-          </Text>
+          <Text color="gray.600">{format(fromUnixTime(post.created_at), "M/d HH:mm:ss")}</Text>
         </GridItem>
       </Grid>
       <HStack position="absolute" top="11px" left="800px" px={2}>
@@ -154,11 +141,7 @@ const OpenViaNosTxButton: React.FC<OpenViaNosTxButtonProps> = ({ noteId }) => {
 
   return (
     <Tooltip label="NosTx経由で開く">
-      <Box
-        role="button"
-        aria-label="open the note via NosTx"
-        onClick={handleClick}
-      >
+      <Box role="button" aria-label="open the note via NosTx" onClick={handleClick}>
         <ExternalLinkIcon color="gray.500" />
       </Box>
     </Tooltip>

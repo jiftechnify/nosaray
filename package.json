@@ -12,10 +12,10 @@
     "preview": "vite preview",
     "tsc": "tsc --noEmit",
     "lint": "run-p tsc lint:*",
-    "lint:format": "prettier --check --loglevel warn src/**/*.{js,jsx,ts,tsx,css}",
+    "lint:format": "prettier --check --log-level warn src/**/*.{js,jsx,ts,tsx,css}",
     "lint:js": "eslint --max-warnings 0 src/",
     "fix": "run-s fix:*",
-    "fix:format": "prettier --write --loglevel warn src/**/*.{js,jsx,ts,tsx,css}",
+    "fix:format": "prettier --write --log-level warn src/**/*.{js,jsx,ts,tsx,css}",
     "fix:js": "eslint --fix src/",
     "exec-ts": "node --loader esbuild-register/loader -r esbuild-register"
   },
@@ -56,5 +56,8 @@
     "typescript": "^5.3.3",
     "vite": "^4.4.9",
     "vite-plugin-babel": "^1.2.0"
+  },
+  "prettier": {
+    "printWidth": 120
   }
 }

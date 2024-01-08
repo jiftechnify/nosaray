@@ -1,10 +1,4 @@
-import {
-  endOfMinute,
-  format,
-  fromUnixTime,
-  getUnixTime,
-  parseISO,
-} from "date-fns";
+import { endOfMinute, format, fromUnixTime, getUnixTime, parseISO } from "date-fns";
 import { TimeUnit } from "./TimeUnit";
 
 type DurationInputs = {
@@ -21,17 +15,13 @@ type WBQueryInputsUntilNow = {
   type: "until-now";
 } & DurationInputs;
 
-export type WaybackQueryInputs =
-  | WBQueryInputsSinceAndDur
-  | WBQueryInputsUntilNow;
+export type WaybackQueryInputs = WBQueryInputsSinceAndDur | WBQueryInputsUntilNow;
 
 type WBQueryInputsTypes = WaybackQueryInputs["type"];
 
 const durRegexp = /^(\d+)([mhd])$/;
 
-const parseDurationInputs = (
-  durStr: string
-): { durationValue: number; durationUnit: TimeUnit } | undefined => {
+const parseDurationInputs = (durStr: string): { durationValue: number; durationUnit: TimeUnit } | undefined => {
   const match = durStr.match(durRegexp);
   if (match === null) {
     return undefined;
@@ -56,21 +46,13 @@ const parseDurationInputs = (
   };
 };
 
-const stringifyDurationInputs = ({
-  durationValue: value,
-  durationUnit: unit,
-}: DurationInputs): string => {
+const stringifyDurationInputs = ({ durationValue: value, durationUnit: unit }: DurationInputs): string => {
   const shortUnit = TimeUnit.toShort(unit);
   return `${value}${shortUnit}`;
 };
 
-const detectWBQueryType = (
-  urlParams: URLSearchParams
-): WBQueryInputsTypes | undefined => {
-  if (
-    urlParams.has("since") &&
-    (urlParams.has("dur") || urlParams.has("len"))
-  ) {
+const detectWBQueryType = (urlParams: URLSearchParams): WBQueryInputsTypes | undefined => {
+  if (urlParams.has("since") && (urlParams.has("dur") || urlParams.has("len"))) {
     return "since-and-dur";
   }
   if (urlParams.has("ago")) {
@@ -79,9 +61,7 @@ const detectWBQueryType = (
   return undefined;
 };
 
-const sinceAndDurfromURLQuery = (
-  params: URLSearchParams
-): WaybackQueryInputs | undefined => {
+const sinceAndDurfromURLQuery = (params: URLSearchParams): WaybackQueryInputs | undefined => {
   const sinceStr = params.get("since");
   const durStr = params.get("dur") || params.get("len"); // "len" is legacy name
 
@@ -101,9 +81,7 @@ const sinceAndDurfromURLQuery = (
   };
 };
 
-const untilNowfromURLQuery = (
-  params: URLSearchParams
-): WaybackQueryInputs | undefined => {
+const untilNowfromURLQuery = (params: URLSearchParams): WaybackQueryInputs | undefined => {
   const agoStr = params.get("ago");
   if (!agoStr) {
     return undefined;
@@ -171,11 +149,9 @@ const secsPerTimeUnit = (unit: TimeUnit): number => {
   }
 };
 
-const durationInSecs = (dur: DurationInputs): number =>
-  dur.durationValue * secsPerTimeUnit(dur.durationUnit);
+const durationInSecs = (dur: DurationInputs): number => dur.durationValue * secsPerTimeUnit(dur.durationUnit);
 
-const formatUnixtime = (unixtime: number) =>
-  format(fromUnixTime(unixtime), "yyyy/MM/dd HH:mm");
+const formatUnixtime = (unixtime: number) => format(fromUnixTime(unixtime), "yyyy/MM/dd HH:mm");
 
 export const WaybackQuery = {
   fromInputs(inputs: WaybackQueryInputs): WaybackQuery | undefined {
@@ -192,10 +168,7 @@ export const WaybackQuery = {
           return undefined;
         }
 
-        const until = Math.min(
-          since + durationInSecs(inputs),
-          getUnixTime(new Date())
-        );
+        const until = Math.min(since + durationInSecs(inputs), getUnixTime(new Date()));
         return { since, until };
       }
       case "until-now": {
