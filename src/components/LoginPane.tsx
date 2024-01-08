@@ -1,12 +1,4 @@
-import {
-  Alert,
-  AlertIcon,
-  AlertTitle,
-  Button,
-  Center,
-  HStack,
-  Text,
-} from "@chakra-ui/react";
+import { Alert, AlertIcon, AlertTitle, Button, Center, HStack, Text } from "@chakra-ui/react";
 import { useAtomValue, useSetAtom } from "jotai";
 import { nip07ExtAtom } from "../states/Nip07Ext";
 import { myPubkeyAtom } from "../states/Profiles";

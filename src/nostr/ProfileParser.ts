@@ -1,9 +1,6 @@
 import type { NostrProfile } from "../types/NostrProfile";
 
-const pullOutStringProp = (
-  r: Record<string, unknown>,
-  keyCandidates: string[]
-): string | undefined => {
+const pullOutStringProp = (r: Record<string, unknown>, keyCandidates: string[]): string | undefined => {
   const candidates: unknown[] = [];
   for (const k of keyCandidates) {
     candidates.push(r[k]);
@@ -17,9 +14,7 @@ const pullOutStringProp = (
   return undefined;
 };
 
-export const parseNostrProfile = (
-  k0Content: string
-): NostrProfile | undefined => {
+export const parseNostrProfile = (k0Content: string): NostrProfile | undefined => {
   try {
     const j = JSON.parse(k0Content) as unknown;
     if (typeof j !== "object" || j === null || Array.isArray(j)) {
@@ -37,10 +32,7 @@ export const parseNostrProfile = (
     };
     return { ...knownProps, ...r };
   } catch {
-    console.error(
-      "parseNostrProfile: failed to parse kind 0 content as profile",
-      k0Content
-    );
+    console.error("parseNostrProfile: failed to parse kind 0 content as profile", k0Content);
     return undefined;
   }
 };

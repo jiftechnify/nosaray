@@ -20,8 +20,8 @@ export const profileAtomFamily = atomFamily((pubkey: string) =>
         return;
       }
       set(profilesAtom, { ...prev, [pubkey]: arg });
-    }
-  )
+    },
+  ),
 );
 
 export const myPubkeyAtom = atomWithStorage<string>("my_pubkey", "");
@@ -66,10 +66,7 @@ store.sub(myDataInitializedAtom, async () => {
     if (followList === undefined || relayList === undefined) {
       return;
     }
-    for await (const profile of EventFetcher.fetchProfiles(
-      followList,
-      getReadRelays(relayList)
-    )) {
+    for await (const profile of EventFetcher.fetchProfiles(followList, getReadRelays(relayList))) {
       const profileAtom = profileAtomFamily(profile.pubkey);
       store.set(profileAtom, profile);
     }

@@ -12,10 +12,10 @@
     "preview": "vite preview",
     "tsc": "tsc --noEmit",
     "lint": "run-p tsc lint:*",
-    "lint:format": "prettier --check --loglevel warn src/**/*.{js,jsx,ts,tsx,css}",
+    "lint:format": "prettier --check --log-level warn src/**/*.{js,jsx,ts,tsx,css}",
     "lint:js": "eslint --max-warnings 0 src/",
     "fix": "run-s fix:*",
-    "fix:format": "prettier --write --loglevel warn src/**/*.{js,jsx,ts,tsx,css}",
+    "fix:format": "prettier --write --log-level warn src/**/*.{js,jsx,ts,tsx,css}",
     "fix:js": "eslint --fix src/",
     "exec-ts": "node --loader esbuild-register/loader -r esbuild-register"
   },
@@ -36,11 +36,12 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@tsconfig/strictest": "^1.0.1",
+    "@tsconfig/strictest": "^2.0.2",
+    "@types/node": "^20.10.7",
     "@types/react": "^18.2.43",
     "@types/react-dom": "^18.2.7",
-    "@typescript-eslint/eslint-plugin": "^5.62.0",
-    "@typescript-eslint/parser": "^5.62.0",
+    "@typescript-eslint/eslint-plugin": "^6.18.0",
+    "@typescript-eslint/parser": "^6.18.0",
     "@vitejs/plugin-react": "^4.2.1",
     "esbuild": "^0.19.2",
     "esbuild-register": "^3.5.0",
@@ -56,5 +57,8 @@
     "typescript": "^5.3.3",
     "vite": "^4.4.9",
     "vite-plugin-babel": "^1.2.0"
+  },
+  "prettier": {
+    "printWidth": 120
   }
 }

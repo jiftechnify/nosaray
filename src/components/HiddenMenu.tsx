@@ -1,12 +1,4 @@
-import {
-  Button,
-  Menu,
-  MenuButton,
-  MenuGroup,
-  MenuItemOption,
-  MenuList,
-  MenuOptionGroup,
-} from "@chakra-ui/react";
+import { Button, Menu, MenuButton, MenuGroup, MenuItemOption, MenuList, MenuOptionGroup } from "@chakra-ui/react";
 import { useAtom } from "jotai";
 import { PostDisplayMode, postDisplayModeAtom } from "../states/Config";
 
@@ -27,9 +19,7 @@ export const HiddenMenu = () => {
           onChange={(v) => setPostDispMode(v as PostDisplayMode)}
         >
           <MenuItemOption value="normal">Normal</MenuItemOption>
-          <MenuItemOption value="pubkey-hex-color">
-            Pubkey Hex Color Icon
-          </MenuItemOption>
+          <MenuItemOption value="pubkey-hex-color">Pubkey Hex Color Icon</MenuItemOption>
         </MenuOptionGroup>
       </MenuList>
     </Menu>
