@@ -5,7 +5,7 @@ import { parseNostrProfile } from "./ProfileParser";
 
 const fetcher = NostrFetcher.init({ minLogLevel: "info" });
 
-const bootstrapRelays = ["wss://relay-jp.nostr.wirednet.jp", "wss://relay.damus.io"];
+const bootstrapRelays = ["wss://relay.nostr.band", "wss://directory.yabu.me", "wss://purplepag.es"];
 
 export class EventFetcher {
   private static withBootstraps(relayUrls: string[]) {
