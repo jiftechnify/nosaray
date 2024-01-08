@@ -214,7 +214,7 @@ const useUntilNowForm = () => {
 // can be used to trigger action every minute.
 const useTickOnStartOfMinute = () => {
   const [timestamp, setTimestamp] = useState(getUnixTime(getNow()));
-  const timer = useRef<number | undefined>(undefined);
+  const timer = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const setNextTick = useCallback(() => {
     const currTime = getNow();
