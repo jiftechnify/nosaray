@@ -3773,11 +3773,6 @@ minimist@^1.2.0, minimist@^1.2.6:
   resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.8.tgz#c1a464e7693302e082a075cee0c057741ac4772c"
   integrity sha512-2yyAR8qBkN3YuheJanUpWC5U3bb5osDywNB8RzDVlDwDHbocAJveqqj1u8+SVD7jkWT4yvsHCpWqqWqAxb0zCA==
 
-mitata@^0.1.6:
-  version "0.1.6"
-  resolved "https://registry.yarnpkg.com/mitata/-/mitata-0.1.6.tgz#0d25f0dd105d6c50ec8d9047ee21bed1552fbffd"
-  integrity sha512-VKQ0r3jriTOU9E2Z+mwbZrUmbg4Li4QyFfi7kfHKl6reZhGzL0AYlu3wE0VPXzIwA5xnFzmEQoBwCcNT8stUkA==
-
 ms@2.1.2:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.1.2.tgz#d09d1f357b443f493382a8eb3ccd183872ae6009"
@@ -3825,10 +3820,10 @@ nostr-fetch@^0.15.0:
   dependencies:
     "@nostr-fetch/kernel" "^0.15.0"
 
-nostr-tools@^2.1.1:
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/nostr-tools/-/nostr-tools-2.1.1.tgz#c8739b1aaf719ba0e4249a08f94f946223e0cef5"
-  integrity sha512-rU+CavvVYWsvGpEn8i5Ez+O//adi1H8MVedM1NgMQ21leJ+5nuW4swPZfNAUH05xz34+p90rfMVZpBkREEqrzA==
+nostr-tools@^2.1.3:
+  version "2.1.3"
+  resolved "https://registry.yarnpkg.com/nostr-tools/-/nostr-tools-2.1.3.tgz#424a0dcf329862163ec8914b7c0139f3bc26d70f"
+  integrity sha512-WqfX4A9aVJhyO2Mu4sL0YqjnGRu9hfSKWPjO3WU4lcdhVkDB2EYoHtwIYQoJEYCjGlyMIlZpVoiTn+eHGeJQSQ==
   dependencies:
     "@noble/ciphers" "0.2.0"
     "@noble/curves" "1.2.0"
@@ -3836,7 +3831,7 @@ nostr-tools@^2.1.1:
     "@scure/base" "1.1.1"
     "@scure/bip32" "1.3.1"
     "@scure/bip39" "1.2.1"
-    mitata "^0.1.6"
+  optionalDependencies:
     nostr-wasm v0.1.0
 
 nostr-wasm@v0.1.0:
