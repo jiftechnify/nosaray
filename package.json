@@ -24,7 +24,7 @@
     "@chakra-ui/react": "^2.8.2",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
-    "chakra-dayzed-datepicker": "^0.2.9",
+    "chakra-dayzed-datepicker": "^0.2.10",
     "date-fns": "^3.2.0",
     "dayzed": "^3.2.3",
     "framer-motion": "^10.18.0",
