@@ -22,10 +22,10 @@
   "dependencies": {
     "@chakra-ui/icons": "^2.1.1",
     "@chakra-ui/react": "^2.8.2",
-    "@emotion/react": "^11.11.1",
+    "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
     "chakra-dayzed-datepicker": "^0.2.10",
-    "date-fns": "^3.2.0",
+    "date-fns": "^3.3.1",
     "dayzed": "^3.2.3",
     "framer-motion": "^10.18.0",
     "jotai": "^2.6.4",
@@ -36,11 +36,11 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@tsconfig/strictest": "^2.0.2",
+    "@tsconfig/strictest": "^2.0.3",
     "@types/node": "^20.11.17",
     "@types/react": "^18.2.53",
     "@types/react-dom": "^18.2.18",
-    "@typescript-eslint/eslint-plugin": "^6.19.1",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.20.0",
     "@vitejs/plugin-react": "^4.2.1",
     "esbuild": "^0.20.0",
@@ -55,7 +55,7 @@
     "prettier": "3.2.4",
     "rollup-plugin-visualizer": "^5.12.0",
     "typescript": "^5.3.3",
-    "vite": "^5.0.12",
+    "vite": "^5.1.1",
     "vite-plugin-babel": "^1.2.0"
   },
   "prettier": {
