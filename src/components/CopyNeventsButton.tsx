@@ -1,5 +1,5 @@
 import { CopyIcon } from "@chakra-ui/icons";
-import { IconButton, IconButtonProps, Tooltip, useClipboard } from "@chakra-ui/react";
+import { IconButton, type IconButtonProps, Tooltip, useClipboard } from "@chakra-ui/react";
 import { neventEncode } from "nostr-tools/nip19";
 import { clearPostSelection, useSelectedPostIds } from "../states/Posts";
 

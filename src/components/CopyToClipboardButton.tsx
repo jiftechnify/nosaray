@@ -1,5 +1,5 @@
 import { CheckIcon, CopyIcon } from "@chakra-ui/icons";
-import { Box, PlacementWithLogical, Tooltip, useClipboard } from "@chakra-ui/react";
+import { Box, type PlacementWithLogical, Tooltip, useClipboard } from "@chakra-ui/react";
 
 type TooltipProps = {
   label: string;

@@ -90,6 +90,7 @@ const PostAuthorIcon: React.FC<PostAuthorIconProps> = ({ profile, pubkey }) => {
     case "pubkey-hex-color":
       return (
         <svg viewBox="0 0 48 48">
+          <title>icon</title>
           <circle cx="24" cy="24" r="24" fill={`#${pubkey.slice(0, 8)}`} />
         </svg>
       );

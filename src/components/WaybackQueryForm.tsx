@@ -23,7 +23,7 @@ import { useSetAtom } from "jotai";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { waybackQueryInputsAtom } from "../states/WaybackQuery";
 import type { TimeUnit } from "../types/TimeUnit";
-import { WaybackQuery, WaybackQueryInputs } from "../types/WaybackQuery";
+import { WaybackQuery, type WaybackQueryInputs } from "../types/WaybackQuery";
 
 const getNow = () => new Date();
 
@@ -131,7 +131,7 @@ const useSinceAndDurForm = () => {
         max={100}
         allowMouseWheel
         value={durationValue}
-        onChange={(_, n) => setDurationValue(isNaN(n) ? 0 : n)}
+        onChange={(_, n) => setDurationValue(Number.isNaN(n) ? 0 : n)}
         w="120px"
       >
         <NumberInputField />
@@ -184,7 +184,7 @@ const useUntilNowForm = () => {
         max={100}
         allowMouseWheel
         value={durationValue}
-        onChange={(_, n) => setDurationValue(isNaN(n) ? 0 : n)}
+        onChange={(_, n) => setDurationValue(Number.isNaN(n) ? 0 : n)}
         w="120px"
       >
         <NumberInputField />
@@ -216,6 +216,7 @@ const useTickOnStartOfMinute = () => {
   const [timestamp, setTimestamp] = useState(getUnixTime(getNow()));
   const timer = useRef<NodeJS.Timeout | undefined>(undefined);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies:
   const setNextTick = useCallback(() => {
     const currTime = getNow();
     const nextTickTime = startOfMinute(addMinutes(currTime, 1));
