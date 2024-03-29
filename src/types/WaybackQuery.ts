@@ -31,7 +31,7 @@ const parseDurationInputs = (durStr: string): { durationValue: number; durationU
     return undefined;
   }
   const val = Number(valStr);
-  if (isNaN(val)) {
+  if (Number.isNaN(val)) {
     return undefined;
   }
 

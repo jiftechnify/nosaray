@@ -1,4 +1,4 @@
-import { eventKind, FetchTimeRangeFilter, NostrEvent, NostrFetcher } from "nostr-fetch";
+import { NostrFetcher, eventKind, type FetchTimeRangeFilter, type NostrEvent } from "nostr-fetch";
 import type { NostrProfileWithMeta } from "../types/NostrProfile";
 import type { RelayList } from "../types/RelayList";
 import { parseNostrProfile } from "./ProfileParser";
@@ -7,16 +7,14 @@ const fetcher = NostrFetcher.init({ minLogLevel: "info" });
 
 const bootstrapRelays = ["wss://relay.nostr.band", "wss://directory.yabu.me", "wss://purplepag.es"];
 
-export class EventFetcher {
-  private static withBootstraps(relayUrls: string[]) {
-    return [...relayUrls, ...bootstrapRelays];
-  }
+const relaysWithBootstraps = (relayUrls: string[]) => [...relayUrls, ...bootstrapRelays];
 
+export class EventFetcher {
   public static async fetchSingleProfile(
     pubkey: string,
     relayUrls: string[],
   ): Promise<NostrProfileWithMeta | undefined> {
-    const ev = await fetcher.fetchLastEvent(this.withBootstraps(relayUrls), {
+    const ev = await fetcher.fetchLastEvent(relaysWithBootstraps(relayUrls), {
       authors: [pubkey],
       kinds: [eventKind.metadata],
     });
@@ -30,7 +28,7 @@ export class EventFetcher {
 
   public static async *fetchProfiles(pubkeys: string[], relayUrls: string[]): AsyncIterable<NostrProfileWithMeta> {
     const evIter = fetcher.allEventsIterator(
-      this.withBootstraps(relayUrls),
+      relaysWithBootstraps(relayUrls),
       { authors: pubkeys, kinds: [eventKind.metadata] },
       {},
     );
@@ -50,7 +48,7 @@ export class EventFetcher {
   ): Promise<{ followList: string[]; relayList: RelayList }> {
     const [k3, k10002] = await Promise.all(
       [eventKind.contacts, eventKind.relayList].map(async (kind) =>
-        fetcher.fetchLastEvent(this.withBootstraps(relayUrls), {
+        fetcher.fetchLastEvent(relaysWithBootstraps(relayUrls), {
           authors: [pubkey],
           kinds: [kind],
         }),
@@ -70,7 +68,7 @@ export class EventFetcher {
     relayUrls: string[],
   ): AsyncIterable<NostrEvent> {
     const evIter = fetcher.allEventsIterator(
-      this.withBootstraps(relayUrls),
+      relaysWithBootstraps(relayUrls),
       { authors: pubkeys, kinds: [eventKind.text] },
       timeRangeFilter,
     );
@@ -111,26 +109,23 @@ const parseRelayListInKind3 = (ev: NostrEvent): RelayList => {
 const parseRelayListInKind10002 = (ev: NostrEvent): RelayList => {
   const res: RelayList = {};
 
-  ev.tags
-    .filter((t) => t.length >= 2 && t[0] === "r")
-    .forEach((t) => {
-      const [, url, relayType] = t as [string, string, string | undefined];
+  for (const t of ev.tags.filter((t) => t.length >= 2 && t[0] === "r")) {
+    const [, url, relayType] = t as [string, string, string | undefined];
 
-      if (relayType === undefined) {
-        res[url] = { read: true, write: true };
-      } else {
-        switch (relayType) {
-          case "read":
-            res[url] = { read: true, write: false };
-            return;
-          case "write":
-            res[url] = { read: false, write: true };
-            return;
-          default:
-            console.warn("invalid relay type in kind 10002 event:", relayType);
-        }
+    if (relayType === undefined) {
+      res[url] = { read: true, write: true };
+    } else {
+      switch (relayType) {
+        case "read":
+          res[url] = { read: true, write: false };
+          break;
+        case "write":
+          res[url] = { read: false, write: true };
+          break;
+        default:
+          console.warn("invalid relay type in kind 10002 event:", relayType);
       }
-    });
-
+    }
+  }
   return res;
 };

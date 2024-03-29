@@ -1,7 +1,7 @@
 import { LinkIcon } from "@chakra-ui/icons";
 import { Box, Flex, HStack, Text } from "@chakra-ui/react";
 import { useAtomValue } from "jotai";
-import { PostQuery, usePostIds } from "../states/Posts";
+import { type PostQuery, usePostIds } from "../states/Posts";
 import { useOngoingWaybackQuery, waybackQueryInputsAtom } from "../states/WaybackQuery";
 import { WaybackQuery, WaybackQueryInputs } from "../types/WaybackQuery";
 import { CopyNeventsButton } from "./CopyNeventsButton";

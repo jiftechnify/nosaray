@@ -1,6 +1,6 @@
 import { Button, Menu, MenuButton, MenuGroup, MenuItemOption, MenuList, MenuOptionGroup } from "@chakra-ui/react";
 import { useAtom } from "jotai";
-import { PostDisplayMode, postDisplayModeAtom } from "../states/Config";
+import { type PostDisplayMode, postDisplayModeAtom } from "../states/Config";
 
 export const HiddenMenu = () => {
   const [postDispMode, setPostDispMode] = useAtom(postDisplayModeAtom);
