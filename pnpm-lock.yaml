@@ -30,8 +30,8 @@ dependencies:
     specifier: ^10.18.0
     version: 10.18.0(react-dom@18.2.0)(react@18.2.0)
   jotai:
-    specifier: ^2.6.4
-    version: 2.7.1(@types/react@18.2.73)(react@18.2.0)
+    specifier: ^2.7.2
+    version: 2.7.2(@types/react@18.2.73)(react@18.2.0)
   jotai-devtools:
     specifier: ^0.7.1
     version: 0.7.1(@emotion/react@11.11.4)(@types/react@18.2.73)(react-dom@18.2.0)(react@18.2.0)(redux@5.0.1)
@@ -2885,8 +2885,8 @@ packages:
       - redux
     dev: false
 
-  /jotai@2.7.1(@types/react@18.2.73)(react@18.2.0):
-    resolution: {integrity: sha512-bsaTPn02nFgWNP6cBtg/htZhCu4s0wxqoklRHePp6l/vlsypR9eLn7diRliwXYWMXDpPvW/LLA2afI8vwgFFaw==}
+  /jotai@2.7.2(@types/react@18.2.73)(react@18.2.0):
+    resolution: {integrity: sha512-6Ft5kpNu8p93Ssf1Faoza3hYQZRIYp7rioK8MwTTFnbQKwUyZElwquPwl1h6U0uo9hC0jr+ghO3gcSjc6P35/Q==}
     engines: {node: '>=12.20.0'}
     peerDependencies:
       '@types/react': '>=17.0.0'
