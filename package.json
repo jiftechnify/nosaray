@@ -40,7 +40,7 @@
     "@tsconfig/strictest": "^2.0.3",
     "@types/node": "^20.12.2",
     "@types/react": "^18.2.53",
-    "@types/react-dom": "^18.2.18",
+    "@types/react-dom": "^18.2.24",
     "@vitejs/plugin-react": "^4.2.1",
     "esbuild": "^0.20.0",
     "esbuild-register": "^3.5.0",
