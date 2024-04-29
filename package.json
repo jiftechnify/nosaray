@@ -32,14 +32,14 @@
     "jotai-devtools": "^0.8.0",
     "nostr-fetch": "^0.15.0",
     "nostr-tools": "^2.3.1",
-    "react": "^18.2.0",
+    "react": "^18.3.1",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.6.3",
     "@tsconfig/strictest": "^2.0.3",
     "@types/node": "^20.12.5",
-    "@types/react": "^18.2.75",
+    "@types/react": "^18.3.1",
     "@types/react-dom": "^18.2.24",
     "@vitejs/plugin-react": "^4.2.1",
     "esbuild": "^0.20.0",
