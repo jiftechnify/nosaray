@@ -27,7 +27,7 @@
     "chakra-dayzed-datepicker": "^0.2.10",
     "date-fns": "^3.3.1",
     "dayzed": "^3.2.3",
-    "framer-motion": "^11.0.24",
+    "framer-motion": "^11.1.8",
     "jotai": "^2.8.0",
     "jotai-devtools": "^0.8.0",
     "nostr-fetch": "^0.15.0",
