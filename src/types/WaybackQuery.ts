@@ -11,11 +11,17 @@ type WBQueryInputsSinceAndDur = {
   sinceDatetime: string; // yyyy-MM-ddTHH:mm
 } & DurationInputs;
 
+type WBQueryInputsSinceAndUntil = {
+  type: "since-and-until";
+  sinceDatetime: string; // yyyy-MM-ddTHH:mm
+  untilDatetime: string; // yyyy-MM-ddTHH:mm
+};
+
 type WBQueryInputsUntilNow = {
   type: "until-now";
 } & DurationInputs;
 
-export type WaybackQueryInputs = WBQueryInputsSinceAndDur | WBQueryInputsUntilNow;
+export type WaybackQueryInputs = WBQueryInputsSinceAndDur | WBQueryInputsSinceAndUntil | WBQueryInputsUntilNow;
 
 type WBQueryInputsTypes = WaybackQueryInputs["type"];
 
@@ -52,6 +58,9 @@ const stringifyDurationInputs = ({ durationValue: value, durationUnit: unit }: D
 };
 
 const detectWBQueryType = (urlParams: URLSearchParams): WBQueryInputsTypes | undefined => {
+  if (urlParams.has("since") && urlParams.has("until")) {
+    return "since-and-until";
+  }
   if (urlParams.has("since") && (urlParams.has("dur") || urlParams.has("len"))) {
     return "since-and-dur";
   }
@@ -78,6 +87,21 @@ const sinceAndDurfromURLQuery = (params: URLSearchParams): WaybackQueryInputs | 
     type: "since-and-dur",
     sinceDatetime: sinceStr,
     ...dur,
+  };
+};
+
+const sinceAndUntilfromURLQuery = (params: URLSearchParams): WaybackQueryInputs | undefined => {
+  const sinceStr = params.get("since");
+  const untilStr = params.get("until");
+
+  if (!sinceStr || !untilStr) {
+    return undefined;
+  }
+
+  return {
+    type: "since-and-until",
+    sinceDatetime: sinceStr,
+    untilDatetime: untilStr,
   };
 };
 
@@ -108,6 +132,8 @@ export const WaybackQueryInputs = {
     switch (wbQueryType) {
       case "since-and-dur":
         return sinceAndDurfromURLQuery(params);
+      case "since-and-until":
+        return sinceAndUntilfromURLQuery(params);
       case "until-now":
         return untilNowfromURLQuery(params);
     }
@@ -118,6 +144,11 @@ export const WaybackQueryInputs = {
       case "since-and-dur": {
         params.set("since", inputs.sinceDatetime);
         params.set("dur", stringifyDurationInputs(inputs));
+        break;
+      }
+      case "since-and-until": {
+        params.set("since", inputs.sinceDatetime);
+        params.set("until", inputs.untilDatetime);
         break;
       }
       case "until-now": {
@@ -169,6 +200,26 @@ export const WaybackQuery = {
         }
 
         const until = Math.min(since + durationInSecs(inputs), getUnixTime(new Date()));
+        return { since, until };
+      }
+      case "since-and-until": {
+        let since: number;
+        let until: number;
+        try {
+          since = getUnixTime(parseISO(inputs.sinceDatetime));
+          until = getUnixTime(parseISO(inputs.untilDatetime));
+        } catch (err) {
+          console.error("fromInputs: invalid datetime:", err);
+          return undefined;
+        }
+        if (since === until) {
+          return undefined;
+        }
+        // swap if since > until (user entered times in reverse order)
+        if (since > until) {
+          [since, until] = [until, since];
+        }
+        until = Math.min(until, getUnixTime(new Date()));
         return { since, until };
       }
       case "until-now": {

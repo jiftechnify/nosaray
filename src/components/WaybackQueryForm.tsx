@@ -45,10 +45,12 @@ export const WaybackQueryForm: React.FC = () => {
   const setQueryInputs = useSetAtom(waybackQueryInputsAtom);
 
   const sinceAndDurForm = useSinceAndDurForm();
+  const sinceAndUntilForm = useSinceAndUntilForm();
   const untilNowForm = useUntilNowForm();
 
   const tabs = [
     { key: "since-dur", label: "始点+期間", form: sinceAndDurForm },
+    { key: "since-until", label: "始点+終点", form: sinceAndUntilForm },
     { key: "until-now", label: "現在まで", form: untilNowForm },
   ];
   const [tabIdx, setTabIdx] = useState(0);
@@ -148,6 +150,68 @@ const useSinceAndDurForm = () => {
         ))}
       </Select>
     </HStack>
+  );
+
+  return {
+    queryInputs,
+    view,
+  };
+};
+
+const useSinceAndUntilForm = () => {
+  const now = getNow();
+  const [sinceDate, setSinceDate] = useState<Date>(subHours(now, 1));
+  const [sinceTime, setSinceTime] = useState<string>(format(subHours(now, 1), "HH:mm"));
+  const [untilDate, setUntilDate] = useState<Date>(now);
+  const [untilTime, setUntilTime] = useState<string>(format(now, "HH:mm"));
+
+  const queryInputs: WaybackQueryInputs | undefined = useMemo(() => {
+    const sinceDatetime = `${format(sinceDate, "yyyy-MM-dd")}T${sinceTime}`;
+    const untilDatetime = `${format(untilDate, "yyyy-MM-dd")}T${untilTime}`;
+    return {
+      type: "since-and-until",
+      sinceDatetime,
+      untilDatetime,
+    };
+  }, [sinceDate, sinceTime, untilDate, untilTime]);
+
+  const view = (
+    <VStack>
+      <HStack alignItems="center" justifyContent="center">
+        <SingleDatepicker
+          date={sinceDate}
+          onDateChange={setSinceDate}
+          maxDate={now}
+          configs={{
+            dateFormat: "yyyy/MM/dd",
+            dayNames: jaDayNames,
+            monthNames: jaMonthNames,
+          }}
+          propsConfigs={{
+            inputProps: { w: "140px" },
+          }}
+        />
+        <Input type="time" value={sinceTime} onChange={(e) => setSinceTime(e.target.value)} w="120px" />
+        <Text minW="2em">から</Text>
+      </HStack>
+      <HStack alignItems="center" justifyContent="center">
+        <SingleDatepicker
+          date={untilDate}
+          onDateChange={setUntilDate}
+          maxDate={now}
+          configs={{
+            dateFormat: "yyyy/MM/dd",
+            dayNames: jaDayNames,
+            monthNames: jaMonthNames,
+          }}
+          propsConfigs={{
+            inputProps: { w: "140px" },
+          }}
+        />
+        <Input type="time" value={untilTime} onChange={(e) => setUntilTime(e.target.value)} w="120px" />
+        <Text minW="2em">まで</Text>
+      </HStack>
+    </VStack>
   );
 
   return {
